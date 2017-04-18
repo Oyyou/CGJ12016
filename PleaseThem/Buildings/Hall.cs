@@ -29,14 +29,17 @@ namespace PleaseThem.Buildings
 
       Menu = new Menu(Content);
 
-      FoodCost = 0;
-      WoodCost = 0;
-      StoneCost = 0;
-      GoldCost = 0;
+      Resources = new Models.Resources()
+      {
+        Food = 0,
+        Wood = 0,
+        Stone = 0,
+        Gold = 0,
+      };
 
       MaxMinions = 0;
 
-      Color = Color.White;
+      MinionColor = Color.White;
     }
 
     public override void Update(GameTime gameTime)

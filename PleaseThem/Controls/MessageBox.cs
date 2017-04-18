@@ -16,7 +16,8 @@ namespace PleaseThem.Controls
     private Vector2 _position;
     private string _text;
     private float _timer;
-    private bool _isVisible = false;
+
+    public bool IsVisible = false;
 
     public MessageBox(ContentManager Content)
     {
@@ -29,12 +30,12 @@ namespace PleaseThem.Controls
     {
       _text = text;
       _timer = 0;
-      _isVisible = true;
+      IsVisible = true;
     }
 
     public void Update(GameTime gameTime)
     {
-      if (!_isVisible)
+      if (!IsVisible)
         return;
 
       _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -42,13 +43,13 @@ namespace PleaseThem.Controls
       if (_timer > 3.0f)
       {
         _timer = 0.0f;
-        _isVisible = false;
+        IsVisible = false;
       }
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-      if (!_isVisible)
+      if (!IsVisible)
         return;
 
       spriteBatch.Draw(_texture, _position, Color.White);

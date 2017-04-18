@@ -58,13 +58,8 @@ namespace PleaseThem.Controls
           b.Selected = false;
       }
 
-      int x = _parent.MouseRectangle.X;
-      int y = _parent.MouseRectangle.Y;
-
-      while (x % 32 != 0)
-        x--;
-      while (y % 32 != 0)
-        y--;
+      int x = (int)Math.Floor(_parent.MouseRectangle.X / 32m) * 32;
+      int y = (int)Math.Floor(_parent.MouseRectangle.Y / 32m) * 32;
 
       var position = new Vector2(x, y);
 
@@ -98,10 +93,7 @@ namespace PleaseThem.Controls
 
     private void ButtonClick(Button button, Building building)
     {
-      if (_parent.FoodCount >= building.FoodCost &&
-          _parent.WoodCount >= building.WoodCost &&
-          _parent.StoneCount >= building.StoneCost &&
-          _parent.GoldCount >= building.GoldCost)
+      if (_parent.ResourceManager.CanAfford(building.Resources))
       {
         if (SelectedBuilding != null && button.Selected)
         {

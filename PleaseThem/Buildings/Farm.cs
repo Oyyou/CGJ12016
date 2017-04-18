@@ -38,12 +38,15 @@ namespace PleaseThem.Buildings
 
       Menu = new Menu(Content);
 
-      FoodCost = 25;
-      WoodCost = 50;
-      StoneCost = 0;
-      GoldCost = 0;
+      Resources = new Models.Resources()
+      {
+        Food = 25,
+        Wood = 50,
+        Stone = 0,
+        Gold = 0,
+      };
 
-      Color = Color.Olive;
+      MinionColor = Color.Olive;
       TileType = Tiles.TileType.Farm;
       MaxMinions = 3;
 

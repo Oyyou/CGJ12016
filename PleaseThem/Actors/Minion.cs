@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using PleaseThem.Buildings;
 using PleaseThem.Core;
 using PleaseThem.States;
+using PleaseThem.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,10 @@ namespace PleaseThem.Actors
     private float _resourceCollection = 0f;
 
     public Vector2 Position { get; private set; }
+
+    public Vector2 Target { get; private set; }
+
+    private ResourceTile _resource = null;
 
     public Minion(ContentManager Content, Vector2 position, GameState parent)
     {
@@ -81,59 +86,78 @@ namespace PleaseThem.Actors
         return;
       }
 
-      var resource = _parent.Map.ResourceTiles.Where(c => c.TileType == Employment.TileType).OrderBy(c => Vector2.Distance(Position, c.Position)).FirstOrDefault(); // Should be the closest
+      var changeTarget = (_resource != null && _resource.ResourceCount <= 0) || 
+                         (_resourceCount == 0 && Target == Vector2.Zero);
+
+      // More efficent way
+      // Give each building a list of potential positions
+      // Update when it starts to run out
+
+      if (changeTarget)
+      {
+        Target = Vector2.Zero;
+
+        int i = 0;
+        while (Target == Vector2.Zero)
+        {
+          _resource = _parent.Map.ResourceTiles
+            .Where(c => c.TileType == Employment.TileType)
+            .OrderBy(c => Vector2.Distance(Employment.Position, c.Position)).ToArray()[i]; // Should be the closest
+
+          var left = _resource.Position - new Vector2(32, 0);
+          var right = _resource.Position + new Vector2(32, 0);
+          var up = _resource.Position - new Vector2(0, 32);
+          var down = _resource.Position + new Vector2(0, 32);
+
+          // Check to see if either of the 4 sides are accessible
+          SetTarget(left);
+          SetTarget(right);
+          SetTarget(up);
+          SetTarget(down);
+
+          i++;
+        }
+      }
 
       if (_resourceCount < _resourceMax) // Can we get moar resources!?
       {
-        if (Vector2.Distance(Position, resource.Position) > 32)
+        if (Vector2.Distance(Position, Target) > 0) // Only move if we're 1+ tile away from the resource
         {
-          Move(resource.Position);
+          Move(Target);
         }
         else
         {
-          if (Position.X == resource.Position.X - 32 ||
-             Position.X == resource.Position.X + 32 ||
-             Position.Y == resource.Position.Y - 32 ||
-             Position.Y == resource.Position.Y + 32)
-          {
-
-          }
-          else
-          {
-
-          }
-
           _resourceCollection += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-          if (Position.Y > resource.Position.Y)
+          if (Position.Y > _resource.Position.Y)
           {
             _animationPlayer.PlayAnimation(_walkingUp);
           }
-          else if (Position.Y < resource.Position.Y)
+          else if (Position.Y < _resource.Position.Y)
           {
             _animationPlayer.PlayAnimation(_walkingDown);
           }
-          else if (Position.X > resource.Position.X)
+          else if (Position.X > _resource.Position.X)
           {
             _animationPlayer.PlayAnimation(_walkingRight);
             _animationPlayer.Direction = SpriteEffects.FlipHorizontally;
           }
-          else if (Position.X < resource.Position.X)
+          else if (Position.X < _resource.Position.X)
           {
             _animationPlayer.PlayAnimation(_walkingRight);
             _animationPlayer.Direction = SpriteEffects.None;
           }
 
-          if (_resourceCollection > 0.5f)
+          if (_resourceCollection > 2.5f)
           {
             _resourceCollection = 0.0f;
             _resourceCount++;
-            resource.ResourceCount-=1;
+            _resource.ResourceCount -= 1;
 
-            if (resource.ResourceCount < 0)
+            if (_resource.ResourceCount <= 0)
             {
-              _parent.Map.ResourceTiles.Remove(resource);
-              _parent.Map.Remove(resource.Position);
+              _parent.Map.ResourceTiles.Remove(_resource);
+              _parent.Map.Remove(_resource.Position);
               _parent.Pathfinder.InitializeSearchNodes(_parent.Map);
             }
           }
@@ -141,31 +165,20 @@ namespace PleaseThem.Actors
       }
       else
       {
-        if (Position.X == resource.Position.X - 32 ||
-           Position.X == resource.Position.X + 32 ||
-           Position.Y == resource.Position.Y - 32 ||
-           Position.Y == resource.Position.Y + 32)
-        {
-
-        }
-        else
-        {
-
-        }
-
+        Target = Vector2.Zero;
         var doorPosition = new Vector2(Employment.Position.X + 64, Employment.Position.Y + 96);
 
         if (Vector2.Distance(Position, doorPosition) > 32)
-          Move(doorPosition); // return to resource thing
+          Move(doorPosition); // return to resource building
         else
         {
           switch (Employment.TileType)
           {
             case Tiles.TileType.Tree:
-              _parent.WoodCount += _resourceCount;
+              _parent.ResourceManager.Add(new Models.Resources() { Wood = _resourceCount });
               break;
             case Tiles.TileType.Stone:
-              _parent.StoneCount += _resourceCount;
+              _parent.ResourceManager.Add(new Models.Resources() { Stone = _resourceCount });
               break;
             default:
               break;
@@ -176,6 +189,23 @@ namespace PleaseThem.Actors
       }
     }
 
+    private void SetTarget(Vector2 side)
+    {
+      if (Target != Vector2.Zero)
+        return;
+
+      var available = _parent._minions.All(c => c.Target != side);
+
+      if (!available)
+        return;
+
+      var path = _parent.Pathfinder.FindPath(Position, side);
+
+      if (path.Count > 0)
+        Target = side;
+
+    }
+
     private Vector2 _farmPos1;
     private Vector2 _farmPos2;
     private bool _farmingDown;
@@ -183,7 +213,7 @@ namespace PleaseThem.Actors
     {
       var farm = Employment as Farm;
 
-      if(_farmPos1 == Vector2.Zero)
+      if (_farmPos1 == Vector2.Zero)
       {
         var farmPosition = farm.FarmPositions.Where(c => !c.Working).FirstOrDefault();
         farmPosition.Working = true;
@@ -220,7 +250,7 @@ namespace PleaseThem.Actors
       if (_resourceCollection > 2.5f)
       {
         _resourceCollection = 0.0f;
-        _parent.FoodCount++;
+        _parent.ResourceManager.Add(new Models.Resources() { Food = 1, });
       }
     }
 
@@ -243,7 +273,6 @@ namespace PleaseThem.Actors
     private void Move(Vector2 target)
     {
       float speed = 2;
-
 
       var node = target;
 
@@ -286,7 +315,7 @@ namespace PleaseThem.Actors
     public void Employ(Building building)
     {
       Employment = building;
-      _animationPlayer.Color = building.Color;
+      _animationPlayer.Color = building.MinionColor;
     }
 
     public void Unemploy()

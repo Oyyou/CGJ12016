@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PleaseThem.Controls;
+using PleaseThem.Models;
 using PleaseThem.States;
 using PleaseThem.Tiles;
 using System;
@@ -52,15 +53,14 @@ namespace PleaseThem.Buildings
 
     protected Menu Menu;
 
-    public Color Color { get; protected set; }
+    public Color MinionColor { get; protected set; }
+
+    public Color Color = Color.White;
 
     public int CurrentMinions = 0;
     public int MaxMinions = 5;
 
-    public int FoodCost { get; protected set; }
-    public int WoodCost { get; protected set; }
-    public int StoneCost { get; protected set; }
-    public int GoldCost { get; protected set; }
+    public Resources Resources { get; protected set; }
 
     public TileType TileType { get; protected set; }
 
@@ -71,7 +71,7 @@ namespace PleaseThem.Buildings
 
     public virtual void Update(GameTime gameTime)
     {
-      if (this.Color == new Color(0, 0, 0, 0))
+      if (this.MinionColor == new Color(0, 0, 0, 0))
         throw new Exception("Please set 'Color' on this building: " + this.GetType().ToString());
 
       previousMouse = currentMouse;
@@ -103,7 +103,7 @@ namespace PleaseThem.Buildings
 
     public void Draw(SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.9f);
+      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.9f);
 
       Menu.Draw(spriteBatch, this.Rectangle);
     }

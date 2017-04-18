@@ -300,29 +300,29 @@ namespace PleaseThem.Core
         return new List<Vector2>();
       }
 
-      int count = 0;
-      while (endNode == null)
-      {
-        switch (count)
-        {
-          case 0:
-            endNode = searchNodes[((int)endPoint.X / Map.TileSize) - 1, (int)endPoint.Y / Map.TileSize];
-            break;
-          case 1:
-            endNode = searchNodes[((int)endPoint.X / Map.TileSize) + 1, (int)endPoint.Y / Map.TileSize];
-            break;
-          case 2:
-            endNode = searchNodes[((int)endPoint.X / Map.TileSize), ((int)endPoint.Y / Map.TileSize) - 1];
-            break;
-          case 3:
-            endNode = searchNodes[((int)endPoint.X / Map.TileSize), ((int)endPoint.Y / Map.TileSize) + 1];
-            break;
-          default:
-            throw new Exception("Looks like there is nowhere to go for end node. Oops");
-        }
+      //int count = 0;
+      //while (endNode == null)
+      //{
+      //  switch (count)
+      //  {
+      //    case 0:
+      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize) - 1, (int)endPoint.Y / Map.TileSize];
+      //      break;
+      //    case 1:
+      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize) + 1, (int)endPoint.Y / Map.TileSize];
+      //      break;
+      //    case 2:
+      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize), ((int)endPoint.Y / Map.TileSize) - 1];
+      //      break;
+      //    case 3:
+      //      endNode = searchNodes[((int)endPoint.X / Map.TileSize), ((int)endPoint.Y / Map.TileSize) + 1];
+      //      break;
+      //    default:
+      //      throw new Exception("Looks like there is nowhere to go for end node. Oops");
+      //  }
 
-        count++;
-      }
+      //  count++;
+      //}
 
       // Only try to find a path if the start and end points are different.
       if (startNode == endNode)

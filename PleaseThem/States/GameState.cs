@@ -11,15 +11,19 @@ using PleaseThem.Buildings;
 using Microsoft.Xna.Framework.Input;
 using PleaseThem.Core;
 using PleaseThem.Actors;
+using PleaseThem.Managers;
 
 namespace PleaseThem.States
 {
   public class GameState : State
   {
-    public int FoodCount { get; set; }
-    public int WoodCount { get; set; }
-    public int StoneCount { get; set; }
-    public int GoldCount { get; set; }
+    #region Managers
+
+    public ResourceManager ResourceManager;
+
+    public MinionManager MinionManager;
+
+    #endregion
 
     private Camera _camera;
 
@@ -32,10 +36,13 @@ namespace PleaseThem.States
     private List<Building> _buildings = new List<Building>();
     private Building _selectedBuilding = null;
 
-    private List<Minion> _minions = new List<Minion>();
+    public List<Minion> _minions = new List<Minion>();
 
     private MouseState _currentMouse;
     private MouseState _previousMouse;
+
+    private KeyboardState _currentKeyboard;
+    private KeyboardState _previousKeyboard;
 
     private float _timer;
 
@@ -63,7 +70,10 @@ namespace PleaseThem.States
     public int MaximumMinions { get; private set; }
 
     private ContentManager _content;
+
     private Random _random;
+
+    private bool _isPaused = false;
 
     public GameState(ContentManager content)
       : base(content)
@@ -77,10 +87,9 @@ namespace PleaseThem.States
       Map = new Map(_content, 100, 100);
       _random = new Random();
 
-      FoodCount = 100;
-      WoodCount = 100;
-      StoneCount = 100;
-      GoldCount = 100;
+      ResourceManager = new ResourceManager();
+
+      MinionManager = new MinionManager();
 
       float x = _random.Next(64, (Map.Width * Map.TileSize) - 224); // 224 = HallWidth + 64. 64 = SpaceAroundEdges
       float y = _random.Next(64, (Map.Height * Map.TileSize) - 288);
@@ -106,22 +115,32 @@ namespace PleaseThem.States
 
     public override void Update(GameTime gameTime)
     {
-      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-      if (_timer > 1)
-      {
-        _timer = 0;
-        FoodCount++;
-        WoodCount++;
-        StoneCount++;
-        GoldCount++;
-      }
-
-      _camera.Update(Map);
+      _previousKeyboard = _currentKeyboard;
+      _currentKeyboard = Keyboard.GetState();
 
       _previousMouse = _currentMouse;
       _currentMouse = Mouse.GetState();
 
-      _selectedBuilding = null;
+      if (_currentKeyboard.IsKeyUp(Keys.Space) && _previousKeyboard.IsKeyDown(Keys.Space))
+      {
+        Game1.MessageBox.IsVisible = false;
+        _isPaused = !_isPaused;
+      }
+
+      _camera.Update(Map);
+
+      if (_isPaused)
+      {
+        Game1.MessageBox.Show("PAUSED");
+        return;
+      }
+
+      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+      if (_timer > 1)
+      {
+        _timer = 0;
+        ResourceManager.Increment();
+      }
 
       _buildingSelector.Update(gameTime);
       _selectedBuilding = _buildingSelector.SelectedBuilding;
@@ -131,17 +150,17 @@ namespace PleaseThem.States
       {
         PlaceBuilding();
 
-        if (_currentMouse.LeftButton == ButtonState.Pressed &&
-            _previousMouse.LeftButton == ButtonState.Released)
-        {
-          int x = MouseRectangle.X;
-          int y = MouseRectangle.Y;
+        //if (_currentMouse.LeftButton == ButtonState.Pressed &&
+        //    _previousMouse.LeftButton == ButtonState.Released)
+        //{
+        //  int x = MouseRectangle.X;
+        //  int y = MouseRectangle.Y;
 
-          while (x % 32 != 0) x--;
-          while (y % 32 != 0) y--;
+        //  while (x % 32 != 0) x--;
+        //  while (y % 32 != 0) y--;
 
-          Console.WriteLine($"X: {x}  Y: {y}");
-        }
+        //  Console.WriteLine($"X: {x}  Y: {y}");
+        //}
       }
 
       foreach (var building in _buildings)
@@ -227,16 +246,14 @@ namespace PleaseThem.States
             }
             else if (canBuild)
             {
+              _selectedBuilding.Color = Color.White;
               _buildings.Add(_selectedBuilding);
               _selectedBuilding.Initialise();
 
               Map.Add(_selectedBuilding.CollisionRectangle);
-              Pathfinder.InitializeSearchNodes(Map);
+              Pathfinder.InitializeSearchNodes(Map); // We can't possibly call this everytime a minion enters a new tile..?
 
-              FoodCount -= _selectedBuilding.FoodCost;
-              WoodCount -= _selectedBuilding.WoodCost;
-              StoneCount -= _selectedBuilding.StoneCost;
-              GoldCount -= _selectedBuilding.GoldCost;
+              ResourceManager.Use(_selectedBuilding.Resources);
 
               if (_selectedBuilding is House)
               {
@@ -244,6 +261,7 @@ namespace PleaseThem.States
               }
 
               _buildingSelector.SelectedBuilding = null;
+              _selectedBuilding = null;
             }
           }
         }
@@ -261,7 +279,7 @@ namespace PleaseThem.States
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       // Camera stuff
-      spriteBatch.Begin(/*SpriteSortMode.FrontToBack, */ transformMatrix: _camera.Transform);
+      spriteBatch.Begin(/*SpriteSortMode.FrontToBack,*/ transformMatrix: _camera.Transform);
 
       Map.Draw(spriteBatch);
 
@@ -272,7 +290,10 @@ namespace PleaseThem.States
         minion.Draw(gameTime, spriteBatch);
 
       if (_selectedBuilding != null)
+      {
+        _selectedBuilding.Color = Color.Green;
         _selectedBuilding.Draw(spriteBatch);
+      }
 
       spriteBatch.End();
 

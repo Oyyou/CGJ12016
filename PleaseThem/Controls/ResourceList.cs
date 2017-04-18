@@ -29,7 +29,7 @@ namespace PleaseThem.Controls
     public void Draw(SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, _position, Color.White);
-      spriteBatch.DrawString(_font, $"Food: {_parent.FoodCount} | Wood: {_parent.WoodCount} | Stone: {_parent.StoneCount} | Gold: {_parent.GoldCount}", new Vector2(5, 5), Color.Red);
+      spriteBatch.DrawString(_font, $"Food: {_parent.ResourceManager.Food} | Wood: {_parent.ResourceManager.Wood} | Stone: {_parent.ResourceManager.Stone} | Gold: {_parent.ResourceManager.Gold}", new Vector2(5, 5), Color.Red);
     }
   }
 }
