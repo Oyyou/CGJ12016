@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Controls
 {
-  public class BuildingList
+  public class BuildingList : Component
   {
     private ContentManager Content;
     private GameState _parent;
@@ -45,7 +45,7 @@ namespace PleaseThem.Controls
       _buttons.Add(_house = new Button(buttonTexture, font, new Vector2(_farm.Rectangle.Right + 10, 470 - buttonTexture.Height), "House"));
     }
 
-    public void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
       foreach (var button in _buttons)
         button.Update();
@@ -115,7 +115,7 @@ namespace PleaseThem.Controls
       }
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, _rectangle, Color.White);
 

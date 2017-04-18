@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using PleaseThem.Core;
 using PleaseThem.Actors;
 using PleaseThem.Managers;
+using PleaseThem.Buildings.Government;
 
 namespace PleaseThem.States
 {
@@ -26,12 +27,15 @@ namespace PleaseThem.States
     #endregion
 
     private Camera _camera;
-
-    private ResourceList _resourceList;
+    
     private BuildingList _buildingSelector;
 
     public Map Map { get; private set; }
     public Pathfinder Pathfinder { get; private set; }
+
+    private List<Component> _components;
+
+    private List<Component> _hudComponents;
 
     private List<Building> _buildings = new List<Building>();
     private Building _selectedBuilding = null;
@@ -80,8 +84,6 @@ namespace PleaseThem.States
     {
       _content = content;
 
-      _resourceList = new ResourceList(_content.Load<Texture2D>("Controls/ResourceList"),
-                                       _content.Load<SpriteFont>("Fonts/Arial08pt"), this);
       _buildingSelector = new BuildingList(_content, this);
 
       Map = new Map(_content, 100, 100);
@@ -106,6 +108,33 @@ namespace PleaseThem.States
 
       AddMinions(_buildings.FirstOrDefault()); // Adding minions in-front of the 'hall' 
 
+      _components = new List<Component>()
+      {
+        new TownHall(this, content.Load<Texture2D>("Buildings/Hall"))
+        {
+          Position = hallPosition,
+        },
+      };
+
+      Map.CleanArea(new Vector2(hallPosition.X + 80, hallPosition.Y + 80), 10);
+
+      foreach (var component in _components)
+      {
+        if (component is Models.Sprite)
+        {
+          var sprite = component as Models.Sprite;
+
+          if (sprite is Models.Building)
+            Map.Add(sprite.CollisionRectangle);
+        }
+      }
+
+      _hudComponents = new List<Component>()
+      {
+        new ResourceList(_content.Load<Texture2D>("Controls/ResourceList"),
+                         _content.Load<SpriteFont>("Fonts/Arial08pt"), this),
+        _buildingSelector,
+      };
 
       _camera = new Camera(new Vector2(hallPosition.X - 400, hallPosition.Y - 240));
       Pathfinder = new Pathfinder(Map);
@@ -142,7 +171,12 @@ namespace PleaseThem.States
         ResourceManager.Increment();
       }
 
-      _buildingSelector.Update(gameTime);
+      foreach (var compontent in _hudComponents)
+        compontent.Update(gameTime);
+
+      //foreach (var component in _components)
+      //  component.Update(gameTime);
+      
       _selectedBuilding = _buildingSelector.SelectedBuilding;
 
       // If we're not on the interface stuff
@@ -283,6 +317,9 @@ namespace PleaseThem.States
 
       Map.Draw(spriteBatch);
 
+      //foreach (var component in _components)
+      //  component.Draw(gameTime, spriteBatch);
+
       foreach (var building in _buildings)
         building.Draw(spriteBatch);
 
@@ -298,8 +335,10 @@ namespace PleaseThem.States
       spriteBatch.End();
 
       spriteBatch.Begin();
-      _resourceList.Draw(spriteBatch);
-      _buildingSelector.Draw(spriteBatch);
+
+      foreach (var component in _hudComponents)
+        component.Draw(gameTime, spriteBatch);
+
       spriteBatch.End();
     }
   }

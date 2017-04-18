@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Controls
 {
-  public class ResourceList
+  public class ResourceList : Component
   {
     private Texture2D _texture;
     private SpriteFont _font;
@@ -26,10 +26,15 @@ namespace PleaseThem.Controls
       _position = new Vector2(0, 0);
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, _position, Color.White);
       spriteBatch.DrawString(_font, $"Food: {_parent.ResourceManager.Food} | Wood: {_parent.ResourceManager.Wood} | Stone: {_parent.ResourceManager.Stone} | Gold: {_parent.ResourceManager.Gold}", new Vector2(5, 5), Color.Red);
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+
     }
   }
 }

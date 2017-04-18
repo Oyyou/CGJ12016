@@ -40,11 +40,13 @@
   <ItemGroup>
     <Compile Include="Actors\Minion.cs" />
     <Compile Include="Buildings\Building.cs" />
+    <Compile Include="Buildings\Government\TownHall.cs" />
     <Compile Include="Buildings\Hall.cs" />
     <Compile Include="Buildings\House.cs" />
     <Compile Include="Buildings\Farm.cs" />
     <Compile Include="Buildings\Mining.cs" />
     <Compile Include="Buildings\Lumber.cs" />
+    <Compile Include="Component.cs" />
     <Compile Include="Controllers\AnimationController.cs" />
     <Compile Include="Controls\BuildingList.cs" />
     <Compile Include="Controls\Button.cs" />

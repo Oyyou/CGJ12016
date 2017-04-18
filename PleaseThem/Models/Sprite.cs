@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Models
 {
-  public class Sprite
+  public class Sprite : Component
   {
     protected readonly AnimationController _animationController;
 
@@ -20,6 +20,17 @@ namespace PleaseThem.Models
     protected readonly GameState _parent;
 
     protected readonly Texture2D _texture;
+
+    public virtual Rectangle CollisionRectangle
+    {
+      get
+      {
+        var width = _texture != null ? _texture.Width : _animationPlayer.FrameWidth;
+        var height = _texture != null ? _texture.Height : _animationPlayer.FrameHeight;
+
+        return new Rectangle((int)Position.X, (int)Position.Y, width, height);
+      }
+    }
 
     public Color Colour { get; set; }
 
@@ -35,7 +46,7 @@ namespace PleaseThem.Models
 
     public float Layer { get; set; }
 
-    public Vector2 Position { get; protected set; }
+    public Vector2 Position { get; set; }
 
     public float Rotation { get; protected set; }
 
@@ -72,12 +83,12 @@ namespace PleaseThem.Models
       IsVisible = true;
     }
 
-    public virtual void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
 
     }
 
-    public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       if (!IsVisible)
         return;
