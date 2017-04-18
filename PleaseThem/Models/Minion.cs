@@ -7,6 +7,8 @@ using PleaseThem.Controllers;
 using PleaseThem.States;
 using Microsoft.Xna.Framework;
 using PleaseThem.Tiles;
+using Microsoft.Xna.Framework.Graphics;
+using PleaseThem.Core;
 
 namespace PleaseThem.Models
 {
@@ -20,11 +22,17 @@ namespace PleaseThem.Models
 
   public class Minion : Sprite
   {
+    private Vector2 _currentTarget;
+
+    private Vector2 _velocity;
+
     public Occuptations Occuptation { get; set; }
 
     // skills?
     public int Lumbering { get; set; }
+
     public int Mining { get; set; }
+
     public int Farming { get; set; }
 
     public Resources Resources { get; private set; }
@@ -38,10 +46,112 @@ namespace PleaseThem.Models
 
     }
 
+    private void Move(Vector2 target)
+    {
+      float speed = 2;
+
+      var node = target;
+
+      // Needs to change target if reached current
+      var needsTarget = Position.X % Map.TileSize == 0 &&
+                        Position.Y % Map.TileSize == 0;
+
+      if (needsTarget)
+      {
+        var paths = _parent.Pathfinder.FindPath(Position, target);
+
+        if (paths.Count > 0)
+          node = paths.FirstOrDefault() * Map.TileSize;
+
+        _currentTarget = node;
+      }
+      else node = _currentTarget;
+
+      if (node != null)
+      {
+        if (Position.Y > node.Y)
+        {
+          _velocity = new Vector2(0, -speed);
+        }
+        else if (Position.Y < node.Y)
+        {
+          _velocity = new Vector2(0, speed);
+        }
+        else if (Position.X > node.X)
+        {
+          _velocity = new Vector2(-speed, 0);
+        }
+        else if (Position.X < node.X)
+        {
+          _velocity = new Vector2(speed, 0);
+        }
+      }
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+      _velocity = Vector2.Zero;
+
+      Work(gameTime);
+
+      ReturnHome(gameTime);
+
+      SetAnimation();
+
+      Position += _velocity;
+    }
+
+    /// <summary>
+    /// Go home when unemployed
+    /// </summary>
+    /// <param name="gameTime"></param>
+    private void ReturnHome(GameTime gameTime)
+    {
+      // If the minion is employed, leave this method
+      if (Occuptation != Occuptations.Unemployed)
+        return;
+
+      var doorPosition = new Vector2(Home.Position.X + (Map.TileSize * 1), Home.Position.Y + Home.Height - Map.TileSize);
+
+      if (Position == doorPosition)
+        IsVisible = false;
+
+      // If they're already home, leave this method
+      if (!IsVisible)
+        return;
+
+      // Go to the door position of 'Home'
+      Move(doorPosition);
+    }
+
+    private void SetAnimation()
+    {
+      if (_velocity.X > 0)
+      {
+        _animationPlayer.PlayAnimation(_animationController.WalkRight);
+        _animationPlayer.Direction = SpriteEffects.None;
+      }
+      else if (_velocity.X < 0)
+      {
+        _animationPlayer.PlayAnimation(_animationController.WalkRight);
+        _animationPlayer.Direction = SpriteEffects.FlipHorizontally;
+      }
+      else if (_velocity.Y < 0)
+      {
+        _animationPlayer.PlayAnimation(_animationController.WalkUp);
+      }
+      else if (_velocity.Y > 0)
+      {
+        _animationPlayer.PlayAnimation(_animationController.WalkDown);
+      }
+    }
+
     private void Work(GameTime gameTime)
     {
       if (Occuptation == Occuptations.Unemployed)
         return;
+
+      IsVisible = true;
 
       // Walk to resource (if there is space around it)
       // Collect to maximum resources (or until it's depleted)

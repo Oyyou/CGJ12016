@@ -12,5 +12,21 @@ namespace PleaseThem.Models
     public int Wood { get; set; }
     public int Stone { get; set; }
     public int Gold { get; set; }
+
+    public int GetTotal()
+    {
+      return Food +
+        Wood +
+        Stone +
+        Gold;
+    }
+
+    public void Reset()
+    {
+      Food = 0;
+      Wood = 0;
+      Stone = 0;
+      Gold = 0;
+    }
   }
 }

@@ -73,6 +73,8 @@ namespace PleaseThem.Managers
       this.Wood += resources.Wood;
       this.Stone += resources.Stone;
       this.Gold += resources.Gold;
+
+      resources.Reset();
     }
 
     public void Increment(int amount = 1)

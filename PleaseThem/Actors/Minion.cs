@@ -27,15 +27,16 @@ namespace PleaseThem.Actors
 
     private GameState _parent;
 
-    private int _resourceCount = 0;
     private int _resourceMax = 20;
-    private float _resourceCollection = 0f;
+    private float _resourceCollectionTimer = 0f;
 
     public Vector2 Position { get; private set; }
 
     public Vector2 Target { get; private set; }
 
-    private ResourceTile _resource = null;
+    private ResourceTile _resourceTile = null;
+
+    private Models.Resources _resources = null;
 
     public Minion(ContentManager Content, Vector2 position, GameState parent)
     {
@@ -49,6 +50,8 @@ namespace PleaseThem.Actors
 
       _animationPlayer.PlayAnimation(_walkingDown);
       _animationPlayer.Color = Color.White;
+
+      _resources = new Models.Resources();
     }
 
     public void Update(GameTime gameTime)
@@ -78,7 +81,10 @@ namespace PleaseThem.Actors
     private void Work(GameTime gameTime)
     {
       if (Employment == null)
+      {
+        _resourceTile = null; // When the minion isn't working, it's targetted resource is set to null
         return;
+      }
 
       if (Employment.TileType == Tiles.TileType.Farm)
       {
@@ -86,8 +92,9 @@ namespace PleaseThem.Actors
         return;
       }
 
-      var changeTarget = (_resource != null && _resource.ResourceCount <= 0) || 
-                         (_resourceCount == 0 && Target == Vector2.Zero);
+      var changeTarget = _resourceTile == null ||
+                         (_resourceTile != null && _resourceTile.ResourceCount <= 0) ||
+                         (_resources.GetTotal() == 0 && Target == Vector2.Zero);
 
       // More efficent way
       // Give each building a list of potential positions
@@ -100,14 +107,14 @@ namespace PleaseThem.Actors
         int i = 0;
         while (Target == Vector2.Zero)
         {
-          _resource = _parent.Map.ResourceTiles
+          _resourceTile = _parent.Map.ResourceTiles
             .Where(c => c.TileType == Employment.TileType)
             .OrderBy(c => Vector2.Distance(Employment.Position, c.Position)).ToArray()[i]; // Should be the closest
 
-          var left = _resource.Position - new Vector2(32, 0);
-          var right = _resource.Position + new Vector2(32, 0);
-          var up = _resource.Position - new Vector2(0, 32);
-          var down = _resource.Position + new Vector2(0, 32);
+          var left = _resourceTile.Position - new Vector2(32, 0);
+          var right = _resourceTile.Position + new Vector2(32, 0);
+          var up = _resourceTile.Position - new Vector2(0, 32);
+          var down = _resourceTile.Position + new Vector2(0, 32);
 
           // Check to see if either of the 4 sides are accessible
           SetTarget(left);
@@ -119,7 +126,7 @@ namespace PleaseThem.Actors
         }
       }
 
-      if (_resourceCount < _resourceMax) // Can we get moar resources!?
+      if (_resources.GetTotal() < _resourceMax) // Can we get moar resources!?
       {
         if (Vector2.Distance(Position, Target) > 0) // Only move if we're 1+ tile away from the resource
         {
@@ -127,37 +134,49 @@ namespace PleaseThem.Actors
         }
         else
         {
-          _resourceCollection += (float)gameTime.ElapsedGameTime.TotalSeconds;
+          _resourceCollectionTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-          if (Position.Y > _resource.Position.Y)
+          if (Position.Y > _resourceTile.Position.Y)
           {
             _animationPlayer.PlayAnimation(_walkingUp);
           }
-          else if (Position.Y < _resource.Position.Y)
+          else if (Position.Y < _resourceTile.Position.Y)
           {
             _animationPlayer.PlayAnimation(_walkingDown);
           }
-          else if (Position.X > _resource.Position.X)
+          else if (Position.X > _resourceTile.Position.X)
           {
             _animationPlayer.PlayAnimation(_walkingRight);
             _animationPlayer.Direction = SpriteEffects.FlipHorizontally;
           }
-          else if (Position.X < _resource.Position.X)
+          else if (Position.X < _resourceTile.Position.X)
           {
             _animationPlayer.PlayAnimation(_walkingRight);
             _animationPlayer.Direction = SpriteEffects.None;
           }
 
-          if (_resourceCollection > 2.5f)
+          if (_resourceCollectionTimer > 2.5f)
           {
-            _resourceCollection = 0.0f;
-            _resourceCount++;
-            _resource.ResourceCount -= 1;
+            _resourceCollectionTimer = 0.0f;
 
-            if (_resource.ResourceCount <= 0)
+            switch (Employment.TileType)
             {
-              _parent.Map.ResourceTiles.Remove(_resource);
-              _parent.Map.Remove(_resource.Position);
+              case Tiles.TileType.Tree:
+                _resources.Wood++;
+                break;
+              case Tiles.TileType.Stone:
+                _resources.Stone++;
+                break;
+              default:
+                break;
+            }
+
+            _resourceTile.ResourceCount -= 1;
+
+            if (_resourceTile.ResourceCount <= 0)
+            {
+              _parent.Map.ResourceTiles.Remove(_resourceTile);
+              _parent.Map.Remove(_resourceTile.Position);
               _parent.Pathfinder.InitializeSearchNodes(_parent.Map);
             }
           }
@@ -172,19 +191,7 @@ namespace PleaseThem.Actors
           Move(doorPosition); // return to resource building
         else
         {
-          switch (Employment.TileType)
-          {
-            case Tiles.TileType.Tree:
-              _parent.ResourceManager.Add(new Models.Resources() { Wood = _resourceCount });
-              break;
-            case Tiles.TileType.Stone:
-              _parent.ResourceManager.Add(new Models.Resources() { Stone = _resourceCount });
-              break;
-            default:
-              break;
-          }
-
-          _resourceCount = 0;
+          _parent.ResourceManager.Add(_resources);
         }
       }
     }
@@ -245,12 +252,15 @@ namespace PleaseThem.Actors
           _velocity = new Vector2(speed, 0);
       }
 
-      _resourceCollection += (float)gameTime.ElapsedGameTime.TotalSeconds;
+      _resourceCollectionTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      if (_resourceCollection > 2.5f)
+      if (_resourceCollectionTimer > 2.5f)
       {
-        _resourceCollection = 0.0f;
-        _parent.ResourceManager.Add(new Models.Resources() { Food = 1, });
+        _resourceCollectionTimer = 0.0f;
+
+        _resources.Food++;
+
+        _parent.ResourceManager.Add(_resources);
       }
     }
 
@@ -276,7 +286,10 @@ namespace PleaseThem.Actors
 
       var node = target;
 
-      if (_distanceTravelled == 0)
+      var needsTarget = Position.X % Map.TileSize == 0 &&
+                        Position.Y % Map.TileSize == 0;
+
+      if (needsTarget)
       {
         var paths = _parent.Pathfinder.FindPath(Position, target);
 
