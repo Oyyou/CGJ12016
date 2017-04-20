@@ -28,7 +28,7 @@ namespace PleaseThem.States
 
     private Camera _camera;
 
-    private BuildingList _buildingSelector;
+    private BuildingList _buildingList;
 
     public Map Map { get; private set; }
     public Pathfinder Pathfinder { get; private set; }
@@ -36,8 +36,6 @@ namespace PleaseThem.States
     public List<Component> _components;
 
     private List<Component> _guiComponents;
-
-    private Building _selectedBuilding = null;
 
     private MouseState _currentMouse;
     private MouseState _previousMouse;
@@ -81,7 +79,7 @@ namespace PleaseThem.States
     {
       Content = content;
 
-      _buildingSelector = new BuildingList(Content, this);
+      _buildingList = new BuildingList(Content, this);
 
       Map = new Map(Content, 100, 100);
       _random = new Random();
@@ -129,7 +127,7 @@ namespace PleaseThem.States
       {
         new ResourceList(Content.Load<Texture2D>("Controls/ResourceList"),
                          Content.Load<SpriteFont>("Fonts/Arial08pt"), this),
-        _buildingSelector,
+        _buildingList,
       };
 
       _camera = new Camera(new Vector2(hallPosition.X - 400, hallPosition.Y - 240));
@@ -152,11 +150,7 @@ namespace PleaseThem.States
 
     public override void Update(GameTime gameTime)
     {
-      _previousKeyboard = _currentKeyboard;
-      _currentKeyboard = Keyboard.GetState();
-
-      _previousMouse = _currentMouse;
-      _currentMouse = Mouse.GetState();
+      SetInput();
 
       if (_currentKeyboard.IsKeyUp(Keys.Space) && _previousKeyboard.IsKeyDown(Keys.Space))
       {
@@ -172,6 +166,7 @@ namespace PleaseThem.States
         return;
       }
 
+      // Add resources every second
       _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
       if (_timer > 1)
       {
@@ -182,19 +177,9 @@ namespace PleaseThem.States
       foreach (var compontent in _guiComponents)
         compontent.Update(gameTime);
 
-      //foreach (var component in _components)
-      //  component.Update(gameTime);
-
-      _selectedBuilding = _buildingSelector.SelectedBuilding;
-
-      if (_buildingSelector.SelectedBuilding != null && !_components.Contains(_buildingSelector.SelectedBuilding))
+      if (_buildingList.SelectedBuilding != null && !_components.Contains(_buildingList.SelectedBuilding))
       {
-        _components.Add(_selectedBuilding);
-      }
-
-      if(_selectedBuilding != null)
-      {
-
+        _components.Add(_buildingList.SelectedBuilding);
       }
 
       foreach (var component in _components)
@@ -213,8 +198,8 @@ namespace PleaseThem.States
               {
                 if (UnemploymentCount > 0)
                 {
-                  ((Minion)_components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == null).FirstOrDefault()).Employ(building);
-                  building.CurrentMinions++;
+                  var minion = _components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == null).FirstOrDefault() as Minion;
+                  building.Employ(minion);
                 }
                 else
                 {
@@ -231,9 +216,9 @@ namespace PleaseThem.States
             {
               if (building.CurrentMinions > 0)
               {
-                var minion = _components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == building).LastOrDefault() as Minion;
-                minion.Unemploy();
-                building.CurrentMinions--;
+                //var minion = _components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == building).LastOrDefault() as Minion;
+                //minion.Unemploy();
+                building.Unemploy();
                 if (building is Farm)
                   ((Farm)building).FarmPositions.Where(c => c.Working).Last().Working = false;
               }
@@ -249,9 +234,18 @@ namespace PleaseThem.States
       }
     }
 
+    private void SetInput()
+    {
+      _previousKeyboard = _currentKeyboard;
+      _currentKeyboard = Keyboard.GetState();
+
+      _previousMouse = _currentMouse;
+      _currentMouse = Mouse.GetState();
+    }
+
     private void PlaceBuilding()
     {
-      if (_selectedBuilding != null)
+      if (_buildingList.SelectedBuilding != null)
       {
         if (_currentMouse.LeftButton == ButtonState.Pressed &&
             _previousMouse.LeftButton == ButtonState.Released)
@@ -262,11 +256,11 @@ namespace PleaseThem.States
           {
             if (component is Building)
             {
-              if (component == _selectedBuilding)
+              if (component == _buildingList.SelectedBuilding)
                 break;
 
               var building = component as Building;
-              if (building.Rectangle.Intersects(_selectedBuilding.Rectangle))
+              if (building.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
               {
                 canBuild = false;
                 break;
@@ -282,7 +276,7 @@ namespace PleaseThem.States
           {
             foreach (var resource in Map.ResourceTiles)
             {
-              if (resource.Rectangle.Intersects(_selectedBuilding.Rectangle))
+              if (resource.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
               {
                 canBuild = false;
                 break;
@@ -295,23 +289,22 @@ namespace PleaseThem.States
             }
             else if (canBuild)
             {
-              _selectedBuilding.Color = Color.White;
-              _components.Add((Building)_selectedBuilding.Clone());
-              _selectedBuilding.Initialise();
+              _buildingList.SelectedBuilding.Color = Color.White;
+              _components.Add((Building)_buildingList.SelectedBuilding.Clone());
+              _buildingList.SelectedBuilding.Initialise();
 
-              Map.Add(_selectedBuilding.CollisionRectangle);
+              Map.Add(_buildingList.SelectedBuilding.CollisionRectangle);
               Pathfinder.InitializeSearchNodes(Map); // We can't possibly call this everytime a minion enters a new tile..?
 
-              ResourceManager.Use(_selectedBuilding.Resources);
+              ResourceManager.Use(_buildingList.SelectedBuilding.Resources);
 
-              if (_selectedBuilding is House)
+              if (_buildingList.SelectedBuilding is House)
               {
-                AddMinions(_selectedBuilding);
+                AddMinions(_buildingList.SelectedBuilding);
               }
 
-              _buildingSelector.SelectedBuilding.IsRemoved = true;
-              _buildingSelector.SelectedBuilding = null;
-              _selectedBuilding = null;
+              _buildingList.SelectedBuilding.IsRemoved = true;
+              _buildingList.SelectedBuilding = null;
             }
           }
         }
@@ -331,6 +324,7 @@ namespace PleaseThem.States
           })
         {
           Position = new Vector2(building.Position.X + (x * 32), building.Rectangle.Bottom - 32),
+          Home = building,
         });
       }
     }
@@ -344,22 +338,12 @@ namespace PleaseThem.States
 
     private void DrawGame(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      // Camera stuff
-      spriteBatch.Begin(/*SpriteSortMode.FrontToBack,*/ transformMatrix: _camera.Transform);
+      spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _camera.Transform);
 
       Map.Draw(spriteBatch);
 
       foreach (var component in _components)
         component?.Draw(gameTime, spriteBatch);
-
-      //foreach (var building in _buildings)
-      //  building.Draw(spriteBatch);
-
-      //if (_selectedBuilding != null)
-      //{
-      //  _selectedBuilding.Color = Color.Green;
-      //  _selectedBuilding.Draw(spriteBatch);
-      //}
 
       spriteBatch.End();
     }

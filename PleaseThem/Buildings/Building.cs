@@ -21,10 +21,10 @@ namespace PleaseThem.Buildings
     protected MouseState currentMouse;
     protected MouseState previousMouse;
 
-    //private float _hoverTimer; // How long the mouse has been hovering over the building;
-    //private bool _hovering; // Have we been hovering for long enough?
     public bool LeftClicked { get; private set; } // Whether or not the building has been clicked
+
     public bool RightClicked { get; private set; } // Whether or not the building has been clicked
+
     public bool CanHaveWorkers
     {
       get
@@ -33,18 +33,22 @@ namespace PleaseThem.Buildings
       }
     }
 
+    public List<Actors.Minion> Minions { get; private set; }
+
     protected Menu Menu;
 
     public Color MinionColor { get; protected set; }
 
     public Color Color = Color.White;
 
-    public int CurrentMinions = 0;
+    public int CurrentMinions { get { return Minions.Count; } }
+
     public int MaxMinions = 5;
 
     public Building(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
+      Minions = new List<Actors.Minion>();
     }
 
     public Resources Resources { get; protected set; }
@@ -54,6 +58,28 @@ namespace PleaseThem.Buildings
     public virtual void Initialise()
     {
 
+    }
+
+    public void Employ(Actors.Minion minion)
+    {
+      minion.Employment = this;
+      minion.Colour = this.MinionColor;
+      minion.IsVisible = true;
+
+      Minions.Add(minion);
+    }
+
+    public void Unemploy()
+    {
+      if (CurrentMinions == 0)
+        return;
+
+      var minion = Minions.Last();
+
+      minion.Colour = Color.White;
+      minion.Employment = null;
+
+      Minions.Remove(minion);
     }
 
     public override void Update(GameTime gameTime)
@@ -90,7 +116,7 @@ namespace PleaseThem.Buildings
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.9f);
+      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.8f);
 
       Menu.Draw(spriteBatch, this.Rectangle);
     }

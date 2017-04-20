@@ -42,7 +42,7 @@ namespace PleaseThem.Models
       }
     }
 
-    public bool IsVisible { get; protected set; }
+    public bool IsVisible { get; set; }
 
     public float Layer { get; set; }
 
@@ -89,6 +89,7 @@ namespace PleaseThem.Models
     private void Initialize()
     {
       IsVisible = true;
+      Colour = Color.White;
     }
 
     public override void Update(GameTime gameTime)
@@ -107,6 +108,7 @@ namespace PleaseThem.Models
       }
       else if (_animationController != null)
       {
+        _animationPlayer.Colour = Colour;
         _animationPlayer.Draw(gameTime, spriteBatch, Position);
       }
     }

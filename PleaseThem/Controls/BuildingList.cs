@@ -85,6 +85,8 @@ namespace PleaseThem.Controls
 
       if (SelectedBuilding != null)
       {
+        SelectedBuilding.Color = Color.Green;
+
         // I don't use the 'MouseRectangle' because.. Well.. It doesn't work like that, and I'm too rushed to make purty.
         if (Mouse.GetState().Y >= 32 && Mouse.GetState().Y < (480 - 32) - SelectedBuilding.Rectangle.Height &&
             Mouse.GetState().X >= 0 && Mouse.GetState().X < 832 - SelectedBuilding.Rectangle.Width)
@@ -100,6 +102,7 @@ namespace PleaseThem.Controls
       {
         if (SelectedBuilding != null && button.Selected)
         {
+          SelectedBuilding.IsRemoved = true;
           SelectedBuilding = null;
           button.Selected = false;
         }
@@ -107,6 +110,9 @@ namespace PleaseThem.Controls
         {
           foreach (var b in _buttons)
             b.Selected = false;
+
+          if (SelectedBuilding != null)
+            SelectedBuilding.IsRemoved = true;
 
           SelectedBuilding = building;
           button.Selected = true;

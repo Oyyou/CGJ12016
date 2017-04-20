@@ -47,7 +47,7 @@ namespace PleaseThem.Core
     public int LoopCount { get; set; }
 
     public SpriteEffects Direction;
-    public Color Color;
+    public Color Colour;
 
     public void PlayAnimation(Animation animation)
     {
@@ -89,7 +89,7 @@ namespace PleaseThem.Core
 
       _rectangle = new Rectangle(_frameIndex * _animation.FrameWidth, 0, _animation.FrameWidth, _animation.FrameHeight);
 
-      spriteBatch.Draw(_animation.Texture, _position, _rectangle, Color, Rotation, Origin, 1, Direction, 0.9f);
+      spriteBatch.Draw(_animation.Texture, _position, _rectangle, Colour, Rotation, Origin, 1, Direction, 0.9f);
     }
   }
 }
