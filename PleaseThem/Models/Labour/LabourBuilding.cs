@@ -7,7 +7,7 @@ using PleaseThem.Tiles;
 
 namespace PleaseThem.Models.Labour
 {
-  public class LabourBuilding : Models.LabourBuilding
+  public class LabourBuilding : Models.Building
   {
     public List<Resource> Resources { get; private set; }
 

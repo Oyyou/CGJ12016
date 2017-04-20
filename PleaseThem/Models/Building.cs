@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace PleaseThem.Models
 {
-  public class LabourBuilding : Sprite
+  public class Building : Sprite
   {
     public Occuptations Occuptation { get; set; }
 
@@ -19,7 +19,7 @@ namespace PleaseThem.Models
 
     public Vector2 DoorPosition { get; set; }
 
-    public LabourBuilding(GameState parent, Texture2D texture) : base(parent, texture)
+    public Building(GameState parent, Texture2D texture) : base(parent, texture)
     {
     }
   }

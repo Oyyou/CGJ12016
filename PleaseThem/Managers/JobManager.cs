@@ -1,4 +1,5 @@
 ﻿using PleaseThem.Models;
+using PleaseThem.Models.Labour;
 using System;
 using System.Collections.Generic;
 using System.Linq;

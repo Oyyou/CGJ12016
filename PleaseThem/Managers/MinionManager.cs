@@ -13,7 +13,7 @@ namespace PleaseThem.Managers
     {
     }
 
-    public void Employ(Minion minion, Models.LabourBuilding building)
+    public void Employ(Minion minion, Models.Labour.LabourBuilding building)
     {
       if (building.MinionCount < building.MinionCountMax)
       {
