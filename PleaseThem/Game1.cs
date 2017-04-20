@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using PleaseThem.Controls;
 using PleaseThem.Core;
 using PleaseThem.States;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,7 +20,10 @@ namespace PleaseThem
 
     public static MessageBox MessageBox;
 
+    public static Random Random;
+
     public MenuState MenuState;
+
     public GameState GameState;
 
     public Game1()
@@ -51,6 +55,8 @@ namespace PleaseThem
       spriteBatch = new SpriteBatch(GraphicsDevice);
 
       MessageBox = new MessageBox(Content);
+
+      Random = new Random();
 
       MenuState = new MenuState(Content);
       GameState = new GameState(Content);

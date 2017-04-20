@@ -26,24 +26,38 @@ namespace PleaseThem.States
 
     #endregion
 
-    private Camera _camera;
-
     private BuildingList _buildingList;
 
-    public Map Map { get; private set; }
-    public Pathfinder Pathfinder { get; private set; }
-
-    public List<Component> _components;
-
-    private List<Component> _guiComponents;
-
-    private MouseState _currentMouse;
-    private MouseState _previousMouse;
+    private Camera _camera;
 
     private KeyboardState _currentKeyboard;
+
+    private MouseState _currentMouse;
+
+    private bool _isPaused = false;
+
     private KeyboardState _previousKeyboard;
 
+    private MouseState _previousMouse;
+
     private float _timer;
+
+    public Map Map { get; private set; }
+
+    public Pathfinder Pathfinder { get; private set; }
+
+    public List<Component> Components { get; private set; }
+
+    public ContentManager Content;
+
+    public List<Component> GUIComponents { get; private set; }
+
+    public int MaximumMinions { get; private set; }
+
+    public int MinionCount
+    {
+      get { return Components.Where(c => c is Minion).Count(); }
+    }
 
     public Rectangle MouseRectangle
     {
@@ -53,26 +67,13 @@ namespace PleaseThem.States
       }
     }
 
-    public int MinionCount
-    {
-      get { return _components.Where(c => c is Minion).Count(); }
-    }
-
     public int UnemploymentCount
     {
       get
       {
-        return _components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == null).Count();
+        return Components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == null).Count();
       }
     }
-
-    public int MaximumMinions { get; private set; }
-
-    public ContentManager Content;
-
-    private Random _random;
-
-    private bool _isPaused = false;
 
     public GameState(ContentManager content)
       : base(content)
@@ -82,21 +83,20 @@ namespace PleaseThem.States
       _buildingList = new BuildingList(Content, this);
 
       Map = new Map(Content, 100, 100);
-      _random = new Random();
 
       ResourceManager = new ResourceManager();
 
       MinionManager = new MinionManager();
 
-      float x = _random.Next(64, (Map.Width * Map.TileSize) - 224); // 224 = HallWidth + 64. 64 = SpaceAroundEdges
-      float y = _random.Next(64, (Map.Height * Map.TileSize) - 288);
+      float x = Game1.Random.Next(64, (Map.Width * Map.TileSize) - 224); // 224 = HallWidth + 64. 64 = SpaceAroundEdges
+      float y = Game1.Random.Next(64, (Map.Height * Map.TileSize) - 288);
 
       x = (float)Math.Floor(x / Map.TileSize) * Map.TileSize;
       y = (float)Math.Floor(y / Map.TileSize) * Map.TileSize;
 
       Vector2 hallPosition = new Vector2(x, y);
       
-      _components = new List<Component>()
+      Components = new List<Component>()
       {
         new Hall(this, content.Load<Texture2D>("Buildings/Hall"))
         {
@@ -106,7 +106,7 @@ namespace PleaseThem.States
 
       Map.CleanArea(new Vector2(hallPosition.X + 80, hallPosition.Y + 80), 10);
 
-      foreach (var component in _components.ToArray())
+      foreach (var component in Components.ToArray())
       {
         if (component is Models.Sprite)
         {
@@ -123,7 +123,7 @@ namespace PleaseThem.States
         }
       }
 
-      _guiComponents = new List<Component>()
+      GUIComponents = new List<Component>()
       {
         new ResourceList(Content.Load<Texture2D>("Controls/ResourceList"),
                          Content.Load<SpriteFont>("Fonts/Arial08pt"), this),
@@ -138,11 +138,11 @@ namespace PleaseThem.States
 
     public override void PostUpdate(GameTime gameTime)
     {
-      for (int i = 0; i < _components.Count; i++)
+      for (int i = 0; i < Components.Count; i++)
       {
-        if (_components[i].IsRemoved)
+        if (Components[i].IsRemoved)
         {
-          _components.RemoveAt(i);
+          Components.RemoveAt(i);
           i--;
         }
       }
@@ -174,15 +174,15 @@ namespace PleaseThem.States
         ResourceManager.Increment();
       }
 
-      foreach (var compontent in _guiComponents)
+      foreach (var compontent in GUIComponents)
         compontent.Update(gameTime);
 
-      if (_buildingList.SelectedBuilding != null && !_components.Contains(_buildingList.SelectedBuilding))
+      if (_buildingList.SelectedBuilding != null && !Components.Contains(_buildingList.SelectedBuilding))
       {
-        _components.Add(_buildingList.SelectedBuilding);
+        Components.Add(_buildingList.SelectedBuilding);
       }
 
-      foreach (var component in _components)
+      foreach (var component in Components)
       {
         component?.Update(gameTime);
 
@@ -198,7 +198,7 @@ namespace PleaseThem.States
               {
                 if (UnemploymentCount > 0)
                 {
-                  var minion = _components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == null).FirstOrDefault() as Minion;
+                  var minion = Components.Where(c => c is Minion).Where(c => ((Minion)c).Employment == null).FirstOrDefault() as Minion;
                   building.Employ(minion);
                 }
                 else
@@ -252,7 +252,7 @@ namespace PleaseThem.States
         {
           bool canBuild = true;
 
-          foreach (var component in _components)
+          foreach (var component in Components)
           {
             if (component is Building)
             {
@@ -290,7 +290,7 @@ namespace PleaseThem.States
             else if (canBuild)
             {
               _buildingList.SelectedBuilding.Color = Color.White;
-              _components.Add((Building)_buildingList.SelectedBuilding.Clone());
+              Components.Add((Building)_buildingList.SelectedBuilding.Clone());
               _buildingList.SelectedBuilding.Initialise();
 
               Map.Add(_buildingList.SelectedBuilding.CollisionRectangle);
@@ -315,7 +315,7 @@ namespace PleaseThem.States
     {
       for (int x = 0; x < building.Rectangle.Width / 32; x++)
       {
-        _components.Add(new Minion(this, 
+        Components.Add(new Minion(this, 
           new Controllers.AnimationController()
           {
             WalkDown = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingDown"), 4, 0.2f, true),
@@ -342,7 +342,7 @@ namespace PleaseThem.States
 
       Map.Draw(spriteBatch);
 
-      foreach (var component in _components)
+      foreach (var component in Components)
         component?.Draw(gameTime, spriteBatch);
 
       spriteBatch.End();
@@ -352,7 +352,7 @@ namespace PleaseThem.States
     {
       spriteBatch.Begin();
 
-      foreach (var component in _guiComponents)
+      foreach (var component in GUIComponents)
         component?.Draw(gameTime, spriteBatch);
 
       spriteBatch.End();

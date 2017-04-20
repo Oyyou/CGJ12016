@@ -226,7 +226,7 @@ namespace PleaseThem.Actors
       if (Target != Vector2.Zero)
         return;
 
-      var available = _parent._components.Where(c => c is Minion).All(c => ((Minion)c).Target != side);
+      var available = _parent.Components.Where(c => c is Minion).All(c => ((Minion)c).Target != side);
 
       if (!available)
         return;
