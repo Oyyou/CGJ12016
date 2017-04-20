@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using PleaseThem.States;
+using Microsoft.Xna.Framework;
 
 namespace PleaseThem.Models
 {
-  public class Building : Sprite
+  public class LabourBuilding : Sprite
   {
     public Occuptations Occuptation { get; set; }
 
@@ -16,7 +17,9 @@ namespace PleaseThem.Models
 
     public int MinionCountMax { get; set; }
 
-    public Building(GameState parent, Texture2D texture) : base(parent, texture)
+    public Vector2 DoorPosition { get; set; }
+
+    public LabourBuilding(GameState parent, Texture2D texture) : base(parent, texture)
     {
     }
   }

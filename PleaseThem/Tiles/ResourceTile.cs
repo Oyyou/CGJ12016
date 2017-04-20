@@ -18,5 +18,5 @@ namespace PleaseThem.Tiles
       Layer = 0.1f;
       ResourceCount = 100;
     }
-}
+  }
 }

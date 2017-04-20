@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework;
 using PleaseThem.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using PleaseThem.Core;
+using PleaseThem.Managers;
+using PleaseThem.Models.Labour;
 
 namespace PleaseThem.Models
 {
@@ -35,15 +37,18 @@ namespace PleaseThem.Models
 
     public int Farming { get; set; }
 
+    public JobManager JobManager { get; set; }
+
     public Resources Resources { get; private set; }
 
-    public Building Workplace { get; set; }
+    public LabourBuilding Workplace { get; set; }
 
-    public Building Home { get; set; }
+    public LabourBuilding Home { get; set; }
 
-    public Minion(GameState parent, AnimationController animationController) : base(parent, animationController)
+    public Minion(GameState parent, AnimationController animationController)
+      : base(parent, animationController)
     {
-
+      JobManager = new JobManager();
     }
 
     private void Move(Vector2 target)
@@ -148,9 +153,6 @@ namespace PleaseThem.Models
 
     private void Work(GameTime gameTime)
     {
-      if (Occuptation == Occuptations.Unemployed)
-        return;
-
       IsVisible = true;
 
       // Walk to resource (if there is space around it)
@@ -161,15 +163,23 @@ namespace PleaseThem.Models
       TileType tileType;
       switch (Occuptation)
       {
+        case Occuptations.Unemployed:
+          return;
+
         case Occuptations.Lumber:
           tileType = TileType.Tree;
           break;
+
         case Occuptations.Miner:
           tileType = TileType.Stone;
           break;
+
         case Occuptations.Farmer:
           tileType = TileType.Farm;
-          break;
+
+          // Farm
+          return;
+
         default:
           throw new NotImplementedException($"Please implement Occuption '{Occuptation.ToString()}'");
       }

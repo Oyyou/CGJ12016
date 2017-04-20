@@ -19,6 +19,7 @@ namespace PleaseThem
 
     private List<Tile> _backgroundTiles = new List<Tile>();
     public List<ResourceTile> ResourceTiles { get; private set; }
+    public List<Models.Resource> Resources { get; private set; }
 
     private static Random _random;
 
