@@ -22,13 +22,12 @@ namespace PleaseThem.Buildings
       }
     }
 
-    public Mining(ContentManager Content, Vector2 position, GameState parent)
+    public Mining(GameState parent, Texture2D texture)
+      : base(parent, texture)
     {
-      _texture = Content.Load<Texture2D>("Buildings/Mining");
-      Position = position;
       Parent = parent;
 
-      Menu = new Menu(Content);
+      Menu = new Menu(Parent.Content);
 
       Resources = new Models.Resources()
       {

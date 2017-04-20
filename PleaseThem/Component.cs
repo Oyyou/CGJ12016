@@ -8,10 +8,17 @@ using System.Threading.Tasks;
 
 namespace PleaseThem
 {
-  public abstract class Component
+  public abstract class Component : ICloneable
   {
+    public bool IsRemoved { get; set; }
+
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
     public abstract void Update(GameTime gameTime);
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
+    }
   }
 }

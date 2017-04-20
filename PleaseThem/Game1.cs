@@ -80,17 +80,22 @@ namespace PleaseThem
       {
         MenuState.Update(gameTime);
 
+        MenuState.PostUpdate(gameTime);
+
         if (MenuState.Next)
         {
           MenuState.IsActive = false;
           GameState.IsActive = true;
         }
+
         if (MenuState.Quit)
           this.Exit();
       }
       else if(GameState.IsActive)
       {
         GameState.Update(gameTime);
+
+        GameState.PostUpdate(gameTime);
 
         if (GameState.Quit)
         {

@@ -52,6 +52,9 @@ namespace PleaseThem.Controls
 
       if (Keyboard.GetState().IsKeyDown(Keys.Escape) || SelectedBuilding == null)
       {
+        if (SelectedBuilding != null)
+          SelectedBuilding.IsRemoved = true;
+
         SelectedBuilding = null;
 
         foreach (var b in _buttons)
@@ -65,19 +68,19 @@ namespace PleaseThem.Controls
 
       if (_lumber.Clicked)
       {
-          ButtonClick(_lumber, new Lumber(Content, position, _parent));
+        ButtonClick(_lumber, new Lumber(_parent, Content.Load<Texture2D>("Buildings/Lumber")));
       }
       else if (_mining.Clicked)
       {
-          ButtonClick(_mining, new Mining(Content, position, _parent));
+        ButtonClick(_mining, new Mining(_parent, Content.Load<Texture2D>("Buildings/Mining")));
       }
       else if (_farm.Clicked)
       {
-        ButtonClick(_farm, new Farm(Content, position, _parent));
+        ButtonClick(_farm, new Farm(_parent, Content.Load<Texture2D>("Buildings/Farm")));
       }
       else if (_house.Clicked)
       {
-        ButtonClick(_house, new House(Content, position, _parent));
+        ButtonClick(_house, new House(_parent, Content.Load<Texture2D>("Buildings/House")));
       }
 
       if (SelectedBuilding != null)

@@ -34,6 +34,11 @@ namespace PleaseThem.States
       _quit.Text = "Quit";
     }
 
+    public override void PostUpdate(GameTime gameTime)
+    {
+      
+    }
+
     public override void Update(GameTime gameTime)
     {
       _play.Update();

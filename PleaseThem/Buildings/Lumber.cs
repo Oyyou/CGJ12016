@@ -22,13 +22,12 @@ namespace PleaseThem.Buildings
       }
     }
 
-    public Lumber(ContentManager Content, Vector2 position, GameState parent)
+    public Lumber(GameState parent, Texture2D texture)
+      : base(parent, texture)
     {
-      _texture = Content.Load<Texture2D>("Buildings/Lumber");
-      Position = position;
       Parent = parent;
 
-      Menu = new Menu(Content);
+      Menu = new Menu(Parent.Content);
 
       Resources = new Models.Resources()
       {

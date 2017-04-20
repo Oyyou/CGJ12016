@@ -47,6 +47,14 @@ namespace PleaseThem.Models
     public float Layer { get; set; }
 
     public Vector2 Position { get; set; }
+    
+    public Rectangle Rectangle
+    {
+      get
+      {
+        return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+      }
+    }
 
     public float Rotation { get; protected set; }
 

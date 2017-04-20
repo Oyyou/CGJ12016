@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PleaseThem.Buildings;
+using PleaseThem.Controllers;
 using PleaseThem.Core;
 using PleaseThem.States;
 using PleaseThem.Tiles;
@@ -14,66 +15,59 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Actors
 {
-  public class Minion
+  public class Minion : Models.Sprite
   {
-    private AnimationPlayer _animationPlayer;
-    private Animation _walkingRight;
-    private Animation _walkingUp;
-    private Animation _walkingDown;
     private Vector2 _velocity;
-    private Vector2 _idlePosition;
+    private Vector2? _idlePosition = null;
 
     public Building Employment { get; private set; }
 
-    private GameState _parent;
-
     private int _resourceMax = 20;
     private float _resourceCollectionTimer = 0f;
-
-    public Vector2 Position { get; private set; }
-
+    
     public Vector2 Target { get; private set; }
 
     private ResourceTile _resourceTile = null;
 
     private Models.Resources _resources = null;
 
-    public Minion(ContentManager Content, Vector2 position, GameState parent)
+    public Minion(GameState parent, AnimationController animationController)
+      : base(parent, animationController)
     {
       _animationPlayer = new AnimationPlayer();
-      _walkingRight = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingRight"), 4, 0.2f, true);
-      _walkingUp = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingUp"), 4, 0.2f, true);
-      _walkingDown = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingDown"), 4, 0.2f, true);
-      Position = position;
-      _idlePosition = Position;
-      _parent = parent;
 
-      _animationPlayer.PlayAnimation(_walkingDown);
       _animationPlayer.Color = Color.White;
 
       _resources = new Models.Resources();
     }
 
-    public void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
+      if (_idlePosition == null)
+        _idlePosition = Position;
+
       _velocity = new Vector2();
       Work(gameTime);
       Return(gameTime);
 
       if (_velocity.X > 0)
       {
-        _animationPlayer.PlayAnimation(_walkingRight);
+        _animationPlayer.PlayAnimation(_animationController.WalkRight);
         _animationPlayer.Direction = SpriteEffects.None;
       }
       else if (_velocity.X < 0)
       {
-        _animationPlayer.PlayAnimation(_walkingRight);
+        _animationPlayer.PlayAnimation(_animationController.WalkRight);
         _animationPlayer.Direction = SpriteEffects.FlipHorizontally;
       }
       else if (_velocity.Y < 0)
-        _animationPlayer.PlayAnimation(_walkingUp);
+      {
+        _animationPlayer.PlayAnimation(_animationController.WalkUp);
+      }
       else if (_velocity.Y > 0)
-        _animationPlayer.PlayAnimation(_walkingDown);
+      {
+        _animationPlayer.PlayAnimation(_animationController.WalkDown);
+      }
 
       Position += _velocity;
     }
@@ -138,20 +132,20 @@ namespace PleaseThem.Actors
 
           if (Position.Y > _resourceTile.Position.Y)
           {
-            _animationPlayer.PlayAnimation(_walkingUp);
+            _animationPlayer.PlayAnimation(_animationController.WalkUp);
           }
           else if (Position.Y < _resourceTile.Position.Y)
           {
-            _animationPlayer.PlayAnimation(_walkingDown);
+            _animationPlayer.PlayAnimation(_animationController.WalkDown);
           }
           else if (Position.X > _resourceTile.Position.X)
           {
-            _animationPlayer.PlayAnimation(_walkingRight);
+            _animationPlayer.PlayAnimation(_animationController.WalkRight);
             _animationPlayer.Direction = SpriteEffects.FlipHorizontally;
           }
           else if (Position.X < _resourceTile.Position.X)
           {
-            _animationPlayer.PlayAnimation(_walkingRight);
+            _animationPlayer.PlayAnimation(_animationController.WalkRight);
             _animationPlayer.Direction = SpriteEffects.None;
           }
 
@@ -201,7 +195,7 @@ namespace PleaseThem.Actors
       if (Target != Vector2.Zero)
         return;
 
-      var available = _parent._minions.All(c => c.Target != side);
+      var available = _parent._components.Where(c => c is Minion).All(c => ((Minion)c).Target != side);
 
       if (!available)
         return;
@@ -271,11 +265,11 @@ namespace PleaseThem.Actors
 
       if (Position == _idlePosition)
       {
-        _animationPlayer.PlayAnimation(_walkingDown);
+        _animationPlayer.PlayAnimation(_animationController.WalkDown);
         return;
       }
 
-      Move(_idlePosition);
+      Move((Vector2)_idlePosition);
     }
 
     private float _distanceTravelled = 0f;
@@ -339,9 +333,9 @@ namespace PleaseThem.Actors
       _farmPos2 = Vector2.Zero;
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      _animationPlayer.Draw(gameTime, spriteBatch, Position);
-    }
+    //public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    //{
+    //  _animationPlayer.Draw(gameTime, spriteBatch, Position);
+    //}
   }
 }

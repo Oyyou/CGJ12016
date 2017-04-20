@@ -30,13 +30,12 @@ namespace PleaseThem.Buildings
       }
     }
 
-    public Farm(ContentManager Content, Vector2 position, GameState parent)
+    public Farm(GameState parent, Texture2D texture)
+      : base(parent, texture)
     {
-      _texture = Content.Load<Texture2D>("Buildings/Farm");
-      Position = position;
       Parent = parent;
 
-      Menu = new Menu(Content);
+      Menu = new Menu(parent.Content);
 
       Resources = new Models.Resources()
       {

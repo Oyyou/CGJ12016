@@ -14,26 +14,8 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Buildings
 {
-  public class Building
+  public class Building : Sprite
   {
-    protected Texture2D _texture;
-    public Rectangle Rectangle
-    {
-      get
-      {
-        return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
-      }
-    }
-
-    public virtual Rectangle CollisionRectangle
-    {
-      get
-      {
-        throw new Exception("Implement 'CollisionRectangle'");
-      }
-    }
-
-    public Vector2 Position;
     protected GameState Parent;
 
     protected MouseState currentMouse;
@@ -60,6 +42,11 @@ namespace PleaseThem.Buildings
     public int CurrentMinions = 0;
     public int MaxMinions = 5;
 
+    public Building(GameState parent, Texture2D texture)
+      : base(parent, texture)
+    {
+    }
+
     public Resources Resources { get; protected set; }
 
     public TileType TileType { get; protected set; }
@@ -69,7 +56,7 @@ namespace PleaseThem.Buildings
 
     }
 
-    public virtual void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
       if (this.MinionColor == new Color(0, 0, 0, 0))
         throw new Exception("Please set 'Color' on this building: " + this.GetType().ToString());
@@ -101,7 +88,7 @@ namespace PleaseThem.Buildings
       Menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.9f);
 
