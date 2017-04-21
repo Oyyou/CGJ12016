@@ -12,47 +12,41 @@ namespace PleaseThem.Controls
 {
   public class Button
   {
-    private Texture2D _texture;
+    private MouseState _currentMouse;
+
     private SpriteFont _font;
-    private Vector2 _position;
+
+    private MouseState _previousMouse;
+
+    private Texture2D _texture;
+
     public Rectangle Rectangle { get; private set; }
 
-    public string Text { get; set; }
-    public Color Color { get; set; }
     public bool Clicked { get; private set; }
+
+    public Color Color { get; set; }
+
+    public Vector2 Position;
+
     public bool Selected { get; set; }
 
-    private MouseState _currentMouse;
-    private MouseState _previousMouse;
+    public string Text { get; set; }
 
     public Button(Texture2D texture, SpriteFont font, Vector2 position, string text = "")
     {
       _texture = texture;
+
       _font = font;
-      _position = position;
 
-      Rectangle = new Rectangle((int)_position.X, (int)_position.Y, _texture.Width, _texture.Height);
+      Position = position;
+
+      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+
       Color = Color.Black;
+
       Text = text;
+
       Selected = false;
-    }
-
-    public void Update()
-    {
-      _previousMouse = _currentMouse;
-      _currentMouse = Mouse.GetState();
-
-      var mouseRectangle = new Rectangle(_currentMouse.X, _currentMouse.Y, 1, 1);
-
-      Clicked = false;
-
-      if (mouseRectangle.Intersects(Rectangle))
-      {
-        if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
-        {
-          Clicked = true;
-        }
-      }
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -68,6 +62,26 @@ namespace PleaseThem.Controls
         float y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
 
         spriteBatch.DrawString(_font, Text, new Vector2(x, y), Color);
+      }
+    }
+
+    public void Update()
+    {
+      Rectangle = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+
+      _previousMouse = _currentMouse;
+      _currentMouse = Mouse.GetState();
+
+      var mouseRectangle = new Rectangle(_currentMouse.X, _currentMouse.Y, 1, 1);
+
+      Clicked = false;
+
+      if (mouseRectangle.Intersects(Rectangle))
+      {
+        if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
+        {
+          Clicked = true;
+        }
       }
     }
   }

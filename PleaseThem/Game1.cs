@@ -18,13 +18,17 @@ namespace PleaseThem
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
+    public GameState GameState;
+
+    public MenuState MenuState;
+
     public static MessageBox MessageBox;
 
     public static Random Random;
 
-    public MenuState MenuState;
+    public static int ScreenHeight;
 
-    public GameState GameState;
+    public static int ScreenWidth;
 
     public Game1()
     {
@@ -42,7 +46,44 @@ namespace PleaseThem
     {
       IsMouseVisible = true;
 
+      ScreenHeight = graphics.PreferredBackBufferHeight;
+
+      ScreenWidth = graphics.PreferredBackBufferWidth;
+
+      Window.AllowUserResizing = true;
+      Window.ClientSizeChanged += Window_ClientSizeChanged;
+
       base.Initialize();
+    }
+
+    private void Window_ClientSizeChanged(object sender, EventArgs e)
+    {
+      if (graphics.PreferredBackBufferHeight < 480)
+      {
+        graphics.PreferredBackBufferHeight = 480;
+        graphics.ApplyChanges();
+      }
+
+      if (graphics.PreferredBackBufferHeight > 1440)
+      {
+        graphics.PreferredBackBufferHeight = 1440;
+        graphics.ApplyChanges();
+      }
+
+      if (graphics.PreferredBackBufferWidth < 800)
+      {
+        graphics.PreferredBackBufferWidth = 800;
+        graphics.ApplyChanges();
+      }
+
+      if (graphics.PreferredBackBufferWidth > 2560)
+      {
+        graphics.PreferredBackBufferWidth = 2560;
+        graphics.ApplyChanges();
+      }
+
+      ScreenHeight = graphics.PreferredBackBufferHeight;
+      ScreenWidth = graphics.PreferredBackBufferWidth;
     }
 
     /// <summary>
@@ -59,7 +100,7 @@ namespace PleaseThem
       Random = new Random();
 
       MenuState = new MenuState(Content);
-      GameState = new GameState(Content);
+      GameState = new GameState(graphics.GraphicsDevice, Content);
 
       MenuState.IsActive = true;
     }

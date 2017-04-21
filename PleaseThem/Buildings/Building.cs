@@ -2,8 +2,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PleaseThem.Actors;
 using PleaseThem.Controls;
-using PleaseThem.Models;
 using PleaseThem.States;
 using PleaseThem.Tiles;
 using System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Buildings
 {
-  public class Building : Sprite
+  public class Building : Models.Sprite
   {
     #region Fields
 
@@ -40,6 +40,16 @@ namespace PleaseThem.Buildings
 
     public int CurrentMinions { get { return Minions.Count; } }
 
+    public virtual Vector2 DoorPosition
+    {
+      get
+      {
+        var width = (int)Math.Floor((this.Rectangle.Width / Map.TileSize) / 2m);
+
+        return new Vector2(Position.X + (width * Map.TileSize), Rectangle.Bottom - 32);
+      }
+    }
+
     public bool LeftClicked { get; private set; }
 
     public int MaxMinions = 5;
@@ -48,7 +58,7 @@ namespace PleaseThem.Buildings
 
     public List<Actors.Minion> Minions { get; private set; }
 
-    public Resources Resources { get; protected set; }
+    public Models.Resources Resources { get; protected set; }
 
     public bool RightClicked { get; private set; }
 
@@ -74,7 +84,7 @@ namespace PleaseThem.Buildings
 
     public void Employ(Actors.Minion minion)
     {
-      minion.Employment = this;
+      minion.Workplace = this;
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
 
@@ -94,7 +104,7 @@ namespace PleaseThem.Buildings
       var minion = Minions.Last();
 
       minion.Colour = Color.White;
-      minion.Employment = null;
+      minion.Workplace = null;
 
       Minions.Remove(minion);
     }
@@ -112,20 +122,49 @@ namespace PleaseThem.Buildings
       if (_parent.MouseRectangle.Intersects(Rectangle))
       {
         if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
-        {
           LeftClicked = true;
-        }
 
         if (_currentMouse.RightButton == ButtonState.Pressed && _previousMouse.RightButton == ButtonState.Released)
-        {
           RightClicked = true;
-        }
 
         _menu.IsVisible = true;
       }
       else
       {
         _menu.IsVisible = false;
+      }
+
+      if (_currentMouse.Y >= 32 && _currentMouse.Y < (Game1.ScreenHeight - 64))
+      {
+        if (LeftClicked)
+        {
+          if (CanHaveWorkers)
+          {
+            if (_parent.UnemploymentCount > 0)
+            {
+              var minion = _parent.Components.Where(c => c is Minion).Where(c => ((Minion)c).Workplace == null).FirstOrDefault() as Minion;
+              Employ(minion);
+            }
+            else
+            {
+              Game1.MessageBox.Show("There are no unemployed minions");
+            }
+          }
+          else
+          {
+            Game1.MessageBox.Show("Building can't employ");
+          }
+        }
+
+        if (RightClicked)
+        {
+          if (CurrentMinions > 0)
+          {
+            Unemploy();
+            if (this is Farm)
+              ((Farm)this).FarmPositions.Where(c => c.Working).Last().Working = false;
+          }
+        }
       }
 
       _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");

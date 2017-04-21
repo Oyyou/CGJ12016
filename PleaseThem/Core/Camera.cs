@@ -10,6 +10,12 @@ namespace PleaseThem.Core
 {
   public class Camera
   {
+    private MouseState _currentMouseState;
+
+    private Vector2? _moveFromLocation;
+
+    private MouseState _previousMouseState;
+
     private int levelWidth, levelHeight;
 
     private Matrix transform = new Matrix();
@@ -43,6 +49,9 @@ namespace PleaseThem.Core
 
     public void Update(Map map)
     {
+      _previousMouseState = _currentMouseState;
+      _currentMouseState = Mouse.GetState();
+
       float speed = 3f;
 
       if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
@@ -66,10 +75,25 @@ namespace PleaseThem.Core
       else if (_previousScroll > _currentScroll)
         Scale -= 0.1f;
 
+      if (_currentMouseState.MiddleButton == ButtonState.Pressed &&
+          _previousMouseState.MiddleButton == ButtonState.Released)
+      {
+        _moveFromLocation = _currentMouseState.Position.ToVector2();
+      }
+
+      if (_currentMouseState.MiddleButton == ButtonState.Released)
+        _moveFromLocation = null;
+
+      if (_moveFromLocation != null)
+      {
+        var direction = _currentMouseState.Position.ToVector2() - (Vector2)_moveFromLocation;
+        Position -= direction / 50;
+      }
+
       //Scale = MathHelper.Clamp(Scale, 0.1f, 2f);
 
-      _position.X = MathHelper.Clamp(_position.X, 0, (map.Width * Map.TileSize) - 800);
-      _position.Y = MathHelper.Clamp(_position.Y, -32, ((map.Height * Map.TileSize) + 64) - 480);
+      _position.X = MathHelper.Clamp(_position.X, 0, (map.Width * Map.TileSize) - Game1.ScreenWidth);
+      _position.Y = MathHelper.Clamp(_position.Y, -32, ((map.Height * Map.TileSize) + 64) - Game1.ScreenHeight);
 
       transform = Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *
                   Matrix.CreateScale(1.0f);

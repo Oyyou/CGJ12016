@@ -17,6 +17,8 @@ namespace PleaseThem.Controls
     private ContentManager Content;
     private GameState _parent;
 
+    private int _height;
+
     private Texture2D _texture;
     private Rectangle _rectangle;
 
@@ -28,27 +30,41 @@ namespace PleaseThem.Controls
 
     public Building SelectedBuilding;
 
-    public BuildingList(ContentManager Content, GameState parent)
+    public BuildingList(GraphicsDevice graphiceDevice, ContentManager Content, GameState parent)
     {
       this.Content = Content;
       _parent = parent;
 
-      _texture = Content.Load<Texture2D>("Controls/BuildingList");
-      _rectangle = new Rectangle(0, 480 - _texture.Height, _texture.Width, _texture.Height);
-
       Texture2D buttonTexture = Content.Load<Texture2D>("Controls/Button");
+
+      _height = buttonTexture.Height + 20;
+
+      _texture = new Texture2D(graphiceDevice, 1, 1); // Content.Load<Texture2D>("Controls/BuildingList");
+      _texture.SetData(new Color[] { new Color(255, 255, 255), });
+
+      _rectangle = new Rectangle(0, Game1.ScreenHeight - _height, Game1.ScreenWidth, _height);
       SpriteFont font = Content.Load<SpriteFont>("Fonts/Arial08pt");
 
       _buttons.Add(_lumber = new Button(buttonTexture, font, new Vector2(10, 470 - buttonTexture.Height), "Lumber"));
       _buttons.Add(_mining = new Button(buttonTexture, font, new Vector2(_lumber.Rectangle.Right + 10, 470 - buttonTexture.Height), "Mining"));
       _buttons.Add(_farm = new Button(buttonTexture, font, new Vector2(_mining.Rectangle.Right + 10, 470 - buttonTexture.Height), "Farm"));
       _buttons.Add(_house = new Button(buttonTexture, font, new Vector2(_farm.Rectangle.Right + 10, 470 - buttonTexture.Height), "House"));
+
+      //_buttons.Add(_lumber = new Button(parent, buttonTexture, font) { Position = new Vector2(10, 470 - buttonTexture.Height), Text = "Lumber" });
+      //_buttons.Add(_mining = new Button(parent, buttonTexture, font) { Position = new Vector2(_lumber.Rectangle.Right + 10, 470 - buttonTexture.Height), Text = "Mining" });
+      //_buttons.Add(_farm = new Button(parent, buttonTexture, font) { Position = new Vector2(_mining.Rectangle.Right + 10, 470 - buttonTexture.Height), Text = "Farm" });
+      //_buttons.Add(_house = new Button(parent, buttonTexture, font) { Position = new Vector2(_farm.Rectangle.Right + 10, 470 - buttonTexture.Height), Text = "House" });
     }
 
     public override void Update(GameTime gameTime)
     {
+      _rectangle = new Rectangle(0, Game1.ScreenHeight - _height, Game1.ScreenWidth, _height);
+
       foreach (var button in _buttons)
+      {
+        button.Position = new Vector2(button.Position.X, Game1.ScreenHeight - 10 - button.Rectangle.Height);
         button.Update();
+      }
 
       if (Keyboard.GetState().IsKeyDown(Keys.Escape) || SelectedBuilding == null)
       {
@@ -61,8 +77,8 @@ namespace PleaseThem.Controls
           b.Selected = false;
       }
 
-      int x = (int)Math.Floor(_parent.MouseRectangle.X / 32m) * 32;
-      int y = (int)Math.Floor(_parent.MouseRectangle.Y / 32m) * 32;
+      int x = (int)Math.Floor(_parent.MouseRectangle.X / 32m) * Map.TileSize;
+      int y = (int)Math.Floor(_parent.MouseRectangle.Y / 32m) * Map.TileSize;
 
       var position = new Vector2(x, y);
 
@@ -88,8 +104,8 @@ namespace PleaseThem.Controls
         SelectedBuilding.Color = Color.Green;
 
         // I don't use the 'MouseRectangle' because.. Well.. It doesn't work like that, and I'm too rushed to make purty.
-        if (Mouse.GetState().Y >= 32 && Mouse.GetState().Y < (480 - 32) - SelectedBuilding.Rectangle.Height &&
-            Mouse.GetState().X >= 0 && Mouse.GetState().X < 832 - SelectedBuilding.Rectangle.Width)
+        if (Mouse.GetState().Y >= 32 && Mouse.GetState().Y < (Game1.ScreenHeight - _texture.Height) &&
+            Mouse.GetState().X >= 0 && Mouse.GetState().X < Game1.ScreenWidth)
         {
           SelectedBuilding.Position = position;
         }
