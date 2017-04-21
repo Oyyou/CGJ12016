@@ -11,68 +11,37 @@ using System.Threading.Tasks;
 
 namespace PleaseThem
 {
-  public class Map
+  public class Map : Component
   {
-    public const int TileSize = 32;
-    public int Width { get; private set; }
-    public int Height { get; private set; }
-
+    #region Fields
+    
     private List<Tile> _backgroundTiles = new List<Tile>();
-    public List<ResourceTile> ResourceTiles { get; private set; }
-    public List<Models.Resource> Resources { get; private set; }
-
-    private static Random _random;
 
     private int[,] _resourceMap;
-
-    public Map(ContentManager Content, int width, int height)
-    {
-      Width = width;
-      Height = height;
-      _random = new Random();
-
-      Texture2D backgroundTexture = Content.Load<Texture2D>("Tiles/Grass");
-
-      for (int y = 0; y < width; y++)
-      {
-        for (int x = 0; x < height; x++)
-        {
-          _backgroundTiles.Add(new Tile(backgroundTexture, new Vector2(x * TileSize, y * TileSize), TileType.Grass));
-        }
-      }
-
-      _resourceMap = new int[Width, Height];
-      ResourceTiles = new List<ResourceTile>();
-
-      CreateForests();
-      CreateOres();
-
-      var woodTexture = Content.Load<Texture2D>("Tiles/Wood");
-      var OreTexture = Content.Load<Texture2D>("Tiles/Ore");
-
-      for (int y = 0; y < _resourceMap.GetLength(0); y++)
-      {
-        for (int x = 0; x < _resourceMap.GetLength(1); x++)
-        {
-          var position = new Vector2(x * Map.TileSize, y * TileSize);
-          switch (_resourceMap[y, x])
-          {
-            case 1:
-              ResourceTiles.Add(new ResourceTile(woodTexture, position, TileType.Tree));
-              break;
-            case 2:
-              ResourceTiles.Add(new ResourceTile(OreTexture, position, TileType.Stone));
-              break;
-          }
-        }
-      }
-    }
+    
+    #endregion
+    
+    #region Properties
+    
+    public int Height { get; private set; }
+    
+    public List<Models.Resource> Resources { get; private set; }
+    
+    public List<ResourceTile> ResourceTiles { get; private set; }
+    
+    public const int TileSize = 32;
+    
+    public int Width { get; private set; }
+    
+    #endregion
+    
+    #region Methods
 
     public void Add(Rectangle rectangle)
     {
-      var newPosition = new Vector2(rectangle.X / 32, rectangle.Y / 32);
-      var newWidth = rectangle.Width / 32;
-      var newHeight = rectangle.Height / 32;
+      var newPosition = new Vector2(rectangle.X / Map.TileSize, rectangle.Y / Map.TileSize);
+      var newWidth = rectangle.Width / Map.TileSize;
+      var newHeight = rectangle.Height / Map.TileSize;
 
       for (int y = (int)newPosition.Y; y < (int)(newPosition.Y + newHeight); y++)
       {
@@ -95,45 +64,10 @@ namespace PleaseThem
       //  }
       //}
     }
-
-    public void Remove(Vector2 position)
-    {
-      _resourceMap[(int)(position.Y / 32), (int)(position.X / 32)] = (int)TileType.Grass;
-    }
-
-    /// <summary>
-    /// Returns the tile index for the given cell.
-    /// </summary>
-    public TileType GetIndex(int cellX, int cellY)
-    {
-      if (cellX < 0 || cellX > Width - 1 || cellY < 0 || cellY > Height - 1)
-        return 0;
-
-      return (TileType)_resourceMap[cellY, cellX];
-    }
-
-    public void SetIndex(int currentX, int currentY, int previousX, int previousY, TileType tileType)
-    {
-      //_resourceMap[previousY, previousX] = 0;
-      //_resourceMap[currentY, currentX] = (int)tileType;
-
-      //using (StreamWriter writer = new StreamWriter(@"D:\derp.txt"))
-      //{
-      //  for (int y = 0; y < Width; y++)
-      //  {
-      //    for (int x = 0; x < Height; x++)
-      //    {
-      //      writer.Write(_resourceMap[y, x]);
-      //    }
-
-      //    writer.WriteLine();
-      //  }
-      //}
-    }
-
+    
     public void CleanArea(Vector2 position, int radius)
     {
-      var actualPosition = position / 32;
+      var actualPosition = position / Map.TileSize;
 
       for (int y = 0; y < _resourceMap.GetLength(0); y++)
       {
@@ -149,7 +83,7 @@ namespace PleaseThem
             {
               _resourceMap[y, x] = 0;
 
-              var tile = ResourceTiles.Where(c => c.Position == mapPosition * 32).FirstOrDefault();
+              var tile = ResourceTiles.Where(c => c.Position == mapPosition * Map.TileSize).FirstOrDefault();
               ResourceTiles.Remove(tile);
             }
           }
@@ -170,35 +104,26 @@ namespace PleaseThem
       //}
     }
 
-    public void Draw(SpriteBatch spriteBatch)
-    {
-      foreach (var tile in _backgroundTiles)
-        tile.Draw(spriteBatch);
-
-      foreach (var tile in ResourceTiles)
-        tile.Draw(spriteBatch);
-    }
-
     private void CreateForests()
     {
       int min = (Width * Height) / 100;
       int max = (Width * Height) / 50;
 
-      int forestCount = _random.Next(min, max);
+      int forestCount = Game1.Random.Next(min, max);
 
       for (int i = 0; i < forestCount; i++)
       {
-        int size = _random.Next(5, 20);
-        var startPosition = new Vector2(_random.Next(0, Width + 1),
-                                        _random.Next(0, Height + 1));
+        int size = Game1.Random.Next(5, 20);
+        var startPosition = new Vector2(Game1.Random.Next(0, Width + 1),
+                                        Game1.Random.Next(0, Height + 1));
         var radius = size / 2;
 
         var positions = new List<Vector2>();
         int attempt = 100;
         while (size > 0 && attempt > 0)
         {
-          int x = _random.Next((int)(startPosition.X - radius), (int)(startPosition.X + radius));
-          int y = _random.Next((int)(startPosition.Y - radius), (int)(startPosition.Y + radius));
+          int x = Game1.Random.Next((int)(startPosition.X - radius), (int)(startPosition.X + radius));
+          int y = Game1.Random.Next((int)(startPosition.Y - radius), (int)(startPosition.Y + radius));
           var position = new Vector2(x, y);
 
           if (x < 0 || x >= Width ||
@@ -224,21 +149,21 @@ namespace PleaseThem
       int min = (Width * Height) / 300;
       int max = (Width * Height) / 200;
 
-      int count = _random.Next(min, max);
+      int count = Game1.Random.Next(min, max);
 
       for (int i = 0; i < count; i++)
       {
-        int size = _random.Next(3, 7);
-        var startPosition = new Vector2(_random.Next(0, Width + 1),
-                                        _random.Next(0, Height + 1));
+        int size = Game1.Random.Next(3, 7);
+        var startPosition = new Vector2(Game1.Random.Next(0, Width + 1),
+                                        Game1.Random.Next(0, Height + 1));
         var radius = size / 2;
 
         var positions = new List<Vector2>();
         int attempt = 100;
         while (size > 0 && attempt > 0)
         {
-          int x = _random.Next((int)(startPosition.X - radius), (int)(startPosition.X + radius));
-          int y = _random.Next((int)(startPosition.Y - radius), (int)(startPosition.Y + radius));
+          int x = Game1.Random.Next((int)(startPosition.X - radius), (int)(startPosition.X + radius));
+          int y = Game1.Random.Next((int)(startPosition.Y - radius), (int)(startPosition.Y + radius));
           var position = new Vector2(x, y);
 
           if (x < 0 || x >= Width ||
@@ -258,5 +183,80 @@ namespace PleaseThem
         }
       }
     }
+
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      foreach (var tile in _backgroundTiles)
+        tile.Draw(spriteBatch);
+
+      foreach (var tile in ResourceTiles)
+        tile.Draw(spriteBatch);
+    }
+
+    /// <summary>
+    /// Returns the tile index for the given cell.
+    /// </summary>
+    public TileType GetIndex(int cellX, int cellY)
+    {
+      if (cellX < 0 || cellX > Width - 1 || cellY < 0 || cellY > Height - 1)
+        return 0;
+
+      return (TileType)_resourceMap[cellY, cellX];
+    }
+    
+    public Map(ContentManager Content, int width, int height)
+    {
+      Width = width;
+      Height = height;
+
+      Texture2D backgroundTexture = Content.Load<Texture2D>("Tiles/Grass");
+
+      for (int y = 0; y < width; y++)
+      {
+        for (int x = 0; x < height; x++)
+        {
+          _backgroundTiles.Add(new Tile(backgroundTexture, new Vector2(x * TileSize, y * TileSize), TileType.Grass));
+        }
+      }
+
+      _resourceMap = new int[Width, Height];
+      ResourceTiles = new List<ResourceTile>();
+
+      CreateForests();
+      
+      CreateOres();
+
+      var woodTexture = Content.Load<Texture2D>("Tiles/Wood");
+      var OreTexture = Content.Load<Texture2D>("Tiles/Ore");
+
+      for (int y = 0; y < _resourceMap.GetLength(0); y++)
+      {
+        for (int x = 0; x < _resourceMap.GetLength(1); x++)
+        {
+          var position = new Vector2(x * Map.TileSize, y * TileSize);
+          switch (_resourceMap[y, x])
+          {
+            case 1:
+              ResourceTiles.Add(new ResourceTile(woodTexture, position, TileType.Tree));
+              break;
+            case 2:
+              ResourceTiles.Add(new ResourceTile(OreTexture, position, TileType.Stone));
+              break;
+          }
+        }
+      }
+    }
+
+    public void Remove(Vector2 position)
+    {
+      _resourceMap[(int)(position.Y / Map.TileSize), (int)(position.X / Map.TileSize)] = (int)TileType.Grass;
+    }
+    
+    private override void Update(GameTime gameTime)
+    {
+    
+    }
+    
+    #endregion
   }
 }
