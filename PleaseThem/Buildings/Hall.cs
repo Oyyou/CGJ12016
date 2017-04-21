@@ -24,10 +24,6 @@ namespace PleaseThem.Buildings
     public Hall(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
-      Parent = parent;
-
-      Menu = new Menu(Parent.Content);
-
       Resources = new Models.Resources()
       {
         Food = 0,
@@ -45,8 +41,8 @@ namespace PleaseThem.Buildings
     {
       base.Update(gameTime);
 
-      Menu.Update($"Unemployed Minions: {Parent.UnemploymentCount}",
-                   $"Total Minions: {Parent.MinionCount}");
+      _menu.Update($"Unemployed Minions: {_parent.UnemploymentCount}",
+                   $"Total Minions: {_parent.MinionCount}");
     }
   }
 }

@@ -252,7 +252,7 @@ namespace PleaseThem
       _resourceMap[(int)(position.Y / Map.TileSize), (int)(position.X / Map.TileSize)] = (int)TileType.Grass;
     }
     
-    private override void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
     
     }

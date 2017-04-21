@@ -33,10 +33,6 @@ namespace PleaseThem.Buildings
     public Farm(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
-      Parent = parent;
-
-      Menu = new Menu(parent.Content);
-
       Resources = new Models.Resources()
       {
         Food = 25,
@@ -91,7 +87,7 @@ namespace PleaseThem.Buildings
     {
       base.Update(gameTime);
 
-      Menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
+      _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
   }
 }

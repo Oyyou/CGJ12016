@@ -188,6 +188,9 @@ namespace PleaseThem.States
 
         if (component is Building)
         {
+          if (component == _buildingList.SelectedBuilding)
+            continue;
+
           var building = component as Building;
 
           if (_currentMouse.Y >= 32 && _currentMouse.Y < 480 - 64)
@@ -340,7 +343,7 @@ namespace PleaseThem.States
     {
       spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, transformMatrix: _camera.Transform);
 
-      Map.Draw(spriteBatch);
+      Map.Draw(gameTime, spriteBatch);
 
       foreach (var component in Components)
         component?.Draw(gameTime, spriteBatch);

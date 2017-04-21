@@ -17,15 +17,15 @@ namespace PleaseThem.Buildings
   public class Building : Sprite
   {
     #region Fields
-    
+
     protected MouseState _currentMouse;
 
     protected Menu _menu { get; private set; }
-    
+
     protected MouseState _previousMouse;
-    
+
     #endregion
-    
+
     #region Properties
 
     public bool CanHaveWorkers
@@ -36,13 +36,15 @@ namespace PleaseThem.Buildings
       }
     }
 
+    public Color Color { get; set; } = Color.White;
+
     public int CurrentMinions { get { return Minions.Count; } }
 
     public bool LeftClicked { get; private set; }
 
     public int MaxMinions = 5;
 
-    public Color MinionColor { get; protected set; } = Color.White;
+    public Color MinionColor { get; protected set; }
 
     public List<Actors.Minion> Minions { get; private set; }
 
@@ -51,20 +53,21 @@ namespace PleaseThem.Buildings
     public bool RightClicked { get; private set; }
 
     public TileType TileType { get; protected set; }
-    
+
     #endregion
-    
+
     #region Methods
 
     public Building(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
       Minions = new List<Actors.Minion>();
+      _menu = new Menu(parent.Content);
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.8f);
+      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.8f);
 
       _menu.Draw(spriteBatch, Rectangle);
     }
@@ -98,7 +101,7 @@ namespace PleaseThem.Buildings
 
     public override void Update(GameTime gameTime)
     {
-      if (MinionColor == Color.White)
+      if (MinionColor == new Color(0, 0, 0, 0))
         throw new Exception("Please set 'Color' on this building: " + this.GetType().ToString());
 
       _previousMouse = _currentMouse;
@@ -127,7 +130,7 @@ namespace PleaseThem.Buildings
 
       _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
-    
+
     #endregion
   }
 }
