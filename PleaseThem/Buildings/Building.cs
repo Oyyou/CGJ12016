@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -16,14 +16,17 @@ namespace PleaseThem.Buildings
 {
   public class Building : Sprite
   {
-    protected GameState Parent;
+    #region Fields
+    
+    protected MouseState _currentMouse;
 
-    protected MouseState currentMouse;
-    protected MouseState previousMouse;
-
-    public bool LeftClicked { get; private set; } // Whether or not the building has been clicked
-
-    public bool RightClicked { get; private set; } // Whether or not the building has been clicked
+    protected Menu _menu { get; private set; }
+    
+    protected MouseState _previousMouse;
+    
+    #endregion
+    
+    #region Properties
 
     public bool CanHaveWorkers
     {
@@ -33,17 +36,25 @@ namespace PleaseThem.Buildings
       }
     }
 
-    public List<Actors.Minion> Minions { get; private set; }
-
-    protected Menu Menu;
-
-    public Color MinionColor { get; protected set; }
-
-    public Color Color = Color.White;
-
     public int CurrentMinions { get { return Minions.Count; } }
 
+    public bool LeftClicked { get; private set; }
+
     public int MaxMinions = 5;
+
+    public Color MinionColor { get; protected set; } = Color.White;
+
+    public List<Actors.Minion> Minions { get; private set; }
+
+    public Resources Resources { get; protected set; }
+
+    public bool RightClicked { get; private set; }
+
+    public TileType TileType { get; protected set; }
+    
+    #endregion
+    
+    #region Methods
 
     public Building(GameState parent, Texture2D texture)
       : base(parent, texture)
@@ -51,13 +62,11 @@ namespace PleaseThem.Buildings
       Minions = new List<Actors.Minion>();
     }
 
-    public Resources Resources { get; protected set; }
-
-    public TileType TileType { get; protected set; }
-
-    public virtual void Initialise()
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      spriteBatch.Draw(_texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.8f);
 
+      _menu.Draw(spriteBatch, Rectangle);
     }
 
     public void Employ(Actors.Minion minion)
@@ -67,6 +76,11 @@ namespace PleaseThem.Buildings
       minion.IsVisible = true;
 
       Minions.Add(minion);
+    }
+
+    public virtual void Initialise()
+    {
+
     }
 
     public void Unemploy()
@@ -84,41 +98,36 @@ namespace PleaseThem.Buildings
 
     public override void Update(GameTime gameTime)
     {
-      if (this.MinionColor == new Color(0, 0, 0, 0))
+      if (MinionColor == Color.White)
         throw new Exception("Please set 'Color' on this building: " + this.GetType().ToString());
 
-      previousMouse = currentMouse;
-      currentMouse = Mouse.GetState();
+      _previousMouse = _currentMouse;
+      _currentMouse = Mouse.GetState();
       LeftClicked = false;
       RightClicked = false;
 
-      if (Parent.MouseRectangle.Intersects(Rectangle) && !LeftClicked)
+      if (_parent.MouseRectangle.Intersects(Rectangle))
       {
-        if (currentMouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released)
+        if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
         {
           LeftClicked = true;
         }
 
-        if (currentMouse.RightButton == ButtonState.Pressed && previousMouse.RightButton == ButtonState.Released)
+        if (_currentMouse.RightButton == ButtonState.Pressed && _previousMouse.RightButton == ButtonState.Released)
         {
           RightClicked = true;
         }
 
-        Menu.IsVisible = true;
+        _menu.IsVisible = true;
       }
       else
       {
-        Menu.IsVisible = false;
+        _menu.IsVisible = false;
       }
 
-      Menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
+      _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
-
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.8f);
-
-      Menu.Draw(spriteBatch, this.Rectangle);
-    }
+    
+    #endregion
   }
 }
