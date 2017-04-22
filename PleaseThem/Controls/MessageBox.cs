@@ -23,7 +23,7 @@ namespace PleaseThem.Controls
     {
       _texture = Content.Load<Texture2D>("Controls/MessageBox");
       _font = Content.Load<SpriteFont>("Fonts/Arial08pt");
-      _position = new Vector2(400 - (_texture.Width / 2), 48);
+      _position = new Vector2((Game1.ScreenWidth / 2) - (_texture.Width / 2), 48);
     }
 
     public void Show(string text)
@@ -37,6 +37,8 @@ namespace PleaseThem.Controls
     {
       if (!IsVisible)
         return;
+
+      _position = new Vector2((Game1.ScreenWidth / 2) - (_texture.Width / 2), 48);
 
       _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 

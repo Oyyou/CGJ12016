@@ -41,10 +41,10 @@ namespace PleaseThem.Managers
     {
       _resources = new Resources()
       {
-        Food = 150,
-        Wood = 200,
-        Stone = 400,
-        Gold = 350,
+        Food = 1500,
+        Wood = 2000,
+        Stone = 4000,
+        Gold = 3500,
       };
     }
 

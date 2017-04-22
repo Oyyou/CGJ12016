@@ -22,7 +22,9 @@ namespace PleaseThem.Controls
 
     public Rectangle Rectangle { get; private set; }
 
-    public bool Clicked { get; private set; }
+    public bool IsClicked { get; private set; }
+
+    public bool IsHovering { get; private set; }
 
     public Color Color { get; set; }
 
@@ -52,9 +54,18 @@ namespace PleaseThem.Controls
     public void Draw(SpriteBatch spriteBatch)
     {
       if (!Selected)
+      {
         spriteBatch.Draw(_texture, Rectangle, Color.White);
+
+        if (IsHovering)
+        {
+          spriteBatch.Draw(_texture, Rectangle, Color.Gray);
+        }
+      }
       else
+      {
         spriteBatch.Draw(_texture, Rectangle, Color.Yellow);
+      }
 
       if (!string.IsNullOrEmpty(Text))
       {
@@ -74,13 +85,17 @@ namespace PleaseThem.Controls
 
       var mouseRectangle = new Rectangle(_currentMouse.X, _currentMouse.Y, 1, 1);
 
-      Clicked = false;
+      IsClicked = false;
+
+      IsHovering = false;
 
       if (mouseRectangle.Intersects(Rectangle))
       {
+        IsHovering = true;
+
         if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
         {
-          Clicked = true;
+          IsClicked = true;
         }
       }
     }

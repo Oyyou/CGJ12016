@@ -19,9 +19,47 @@ namespace PleaseThem.Models
 
     protected readonly GameState _parent;
 
+    private float _layer;
+
     protected readonly Texture2D _texture;
 
     public virtual Rectangle CollisionRectangle
+    {
+      get
+      {
+        return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+      }
+    }
+
+    public Color Colour { get; set; }
+
+    public float DefaultLayer { get; protected set; }
+
+    public int Height
+    {
+      get
+      {
+        return _texture != null ? _texture.Height : _animationPlayer.FrameHeight;
+      }
+    }
+
+    public bool IsVisible { get; set; }
+
+    public float Layer
+    {
+      get { return _layer; }
+      set
+      {
+        if (_animationController != null)
+          _animationPlayer.Layer = value;
+
+        _layer = value;
+      }
+    }
+
+    public Vector2 Position { get; set; }
+    
+    public Rectangle Rectangle
     {
       get
       {
@@ -32,37 +70,13 @@ namespace PleaseThem.Models
       }
     }
 
-    public Color Colour { get; set; }
-
-    public int Height
-    {
-      get
-      {
-        return _texture.Height;
-      }
-    }
-
-    public bool IsVisible { get; set; }
-
-    public float Layer { get; set; }
-
-    public Vector2 Position { get; set; }
-    
-    public Rectangle Rectangle
-    {
-      get
-      {
-        return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
-      }
-    }
-
     public float Rotation { get; protected set; }
 
     public int Width
     {
       get
       {
-        return _texture.Width;
+        return _texture != null ? _texture.Width : _animationPlayer.FrameWidth;
       }
     }
 

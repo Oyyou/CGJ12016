@@ -44,8 +44,8 @@ namespace PleaseThem.States
       _play.Update();
       _quit.Update();
 
-      Next = _play.Clicked;
-      Quit = _quit.Clicked;
+      Next = _play.IsClicked;
+      Quit = _quit.IsClicked;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

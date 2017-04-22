@@ -93,7 +93,7 @@ namespace PleaseThem.Core
       //Scale = MathHelper.Clamp(Scale, 0.1f, 2f);
 
       _position.X = MathHelper.Clamp(_position.X, 0, (map.Width * Map.TileSize) - Game1.ScreenWidth);
-      _position.Y = MathHelper.Clamp(_position.Y, -32, ((map.Height * Map.TileSize) + 64) - Game1.ScreenHeight);
+      _position.Y = MathHelper.Clamp(_position.Y, -16, ((map.Height * Map.TileSize) + 52) - Game1.ScreenHeight);
 
       transform = Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *
                   Matrix.CreateScale(1.0f);

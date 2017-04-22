@@ -73,11 +73,15 @@ namespace PleaseThem.Buildings
     {
       Minions = new List<Actors.Minion>();
       _menu = new Menu(parent.Content);
+
+      DefaultLayer = 0.7f;
+
+      Layer = DefaultLayer;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0.8f);
+      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
 
       _menu.Draw(spriteBatch, Rectangle);
     }

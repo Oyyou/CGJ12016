@@ -115,16 +115,16 @@ namespace PleaseThem.Actors
     public Minion(GameState parent, AnimationController animationController)
       : base(parent, animationController)
     {
-      _animationPlayer = new AnimationPlayer();
-
       _animationPlayer.Colour = Color.White;
 
       _resources = new Models.Resources();
+
+      Layer = 0.8f;
     }
 
     private void Move(Vector2 target)
     {
-      float speed = 2;
+      float speed = 2f;
 
       var node = target;
 
@@ -263,11 +263,12 @@ namespace PleaseThem.Actors
       if (Workplace.TileType == Tiles.TileType.Farm)
       {
         Farming(gameTime);
+
         return;
       }
 
       var changeTarget = _resourceTile == null ||
-                         (_resourceTile != null && _resourceTile.ResourceCount <= 0) ||
+                         (_resourceTile != null && _resourceTile.ResourceCount <= 0) || // if the resource was emptied by a previous minion
                          (_resources.GetTotal() == 0 && Target == Vector2.Zero);
 
       // More efficent way
@@ -290,14 +291,18 @@ namespace PleaseThem.Actors
           var up = _resourceTile.Position - new Vector2(0, 32);
           var down = _resourceTile.Position + new Vector2(0, 32);
 
-          // Check to see if either of the 4 sides are accessible
-          SetTarget(left);
+          // Check to see if either of the 4 sides are accessible]
+          if (left.X >= 0)
+            SetTarget(left);
 
-          SetTarget(right);
+          if (right.X < (_parent.Map.Width * 32))
+            SetTarget(right);
 
-          SetTarget(up);
+          if (up.Y >= 0)
+            SetTarget(up);
 
-          SetTarget(down);
+          if (down.Y < (_parent.Map.Height * 32))
+            SetTarget(down);
 
           i++;
         }

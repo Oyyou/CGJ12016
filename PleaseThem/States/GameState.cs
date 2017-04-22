@@ -102,6 +102,7 @@ namespace PleaseThem.States
         {
           Position = building.DoorPosition,
           Home = building,
+          IsVisible = false,
         });
       }
     }
@@ -211,13 +212,13 @@ namespace PleaseThem.States
             {
               if (component == _buildingList.SelectedBuilding)
                 break;
+            }
 
-              var building = component as Building;
-              if (building.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
-              {
-                canBuild = false;
-                break;
-              }
+            var building = component as Models.Sprite;
+            if (building.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+            {
+              canBuild = false;
+              break;
             }
           }
 
@@ -242,8 +243,13 @@ namespace PleaseThem.States
             }
             else if (canBuild)
             {
-              _buildingList.SelectedBuilding.Color = Color.White;
-              Components.Add((Building)_buildingList.SelectedBuilding.Clone());
+              var newBuilding = _buildingList.SelectedBuilding.Clone() as Building;
+
+              newBuilding.Color = Color.White;
+              newBuilding.Layer = _buildingList.SelectedBuilding.DefaultLayer;
+
+              Components.Add(newBuilding);
+
               _buildingList.SelectedBuilding.Initialise();
 
               Map.Add(_buildingList.SelectedBuilding.CollisionRectangle);
@@ -326,7 +332,7 @@ namespace PleaseThem.States
       }
 
       // If we're not on the interface stuff
-      if (_currentMouse.Y >= 32 && _currentMouse.Y < (Game1.ScreenHeight - 64))
+      if (_currentMouse.Y >= 16 && _currentMouse.Y < (Game1.ScreenHeight - 64))
       {
         PlaceBuilding();
       }

@@ -38,6 +38,8 @@ namespace PleaseThem.Core
       get { return _animation.FrameHeight; }
     }
 
+    public float Layer { get; set; }
+
     public Vector2 Origin
     {
       get { return new Vector2(0, 0); }
@@ -89,7 +91,7 @@ namespace PleaseThem.Core
 
       _rectangle = new Rectangle(_frameIndex * _animation.FrameWidth, 0, _animation.FrameWidth, _animation.FrameHeight);
 
-      spriteBatch.Draw(_animation.Texture, _position, _rectangle, Colour, Rotation, Origin, 1, Direction, 0.9f);
+      spriteBatch.Draw(_animation.Texture, _position, _rectangle, Colour, Rotation, Origin, 1, Direction, Layer);
     }
   }
 }

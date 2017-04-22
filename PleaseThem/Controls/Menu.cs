@@ -11,11 +11,13 @@ namespace PleaseThem.Controls
 {
   public class Menu
   {
-    private Texture2D _texture;
-    private SpriteFont _font;
-    private Vector2 _position;
-    private Rectangle _rectangle;
     private string[] _content;
+
+    private SpriteFont _font;
+
+    private Rectangle _rectangle;
+
+    private Texture2D _texture;
 
     public bool IsVisible { get; set; }
 
@@ -43,12 +45,12 @@ namespace PleaseThem.Controls
       if (_rectangle.Y < 32)
         _rectangle.Y = (parent.Bottom - 32) + 5; // The 32 is the 'whitespace' I have under buildings.
 
-      spriteBatch.Draw(_texture, _rectangle, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0.95f);
+      spriteBatch.Draw(_texture, _rectangle, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0.85f);
 
       Vector2 fontPosition = new Vector2(_rectangle.X + 10, _rectangle.Y + 10);
       foreach (var content in _content)
       {
-        spriteBatch.DrawString(_font, content, fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1f);
+        spriteBatch.DrawString(_font, content, fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.9f);
 
         var y = _font.MeasureString(content).Y;
 
