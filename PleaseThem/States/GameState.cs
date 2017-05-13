@@ -34,15 +34,13 @@ namespace PleaseThem.States
 
     private KeyboardState _currentKeyboard;
 
-    private MouseState _currentMouse;
-
     private bool _isPaused = false;
 
     private GraphicsDevice _graphicsDevice;
 
-    private KeyboardState _previousKeyboard;
+    private Menu _menu;
 
-    private MouseState _previousMouse;
+    private KeyboardState _previousKeyboard;
 
     private float _timer;
 
@@ -53,6 +51,8 @@ namespace PleaseThem.States
     public List<Component> Components { get; private set; }
 
     public ContentManager Content;
+
+    public MouseState CurrentMouse { get; private set; }
 
     public List<Component> GUIComponents { get; private set; }
 
@@ -65,15 +65,25 @@ namespace PleaseThem.States
       get { return Components.Where(c => c is Minion).Count(); }
     }
 
+    public Rectangle MouseRectangleWithCamera
+    {
+      get
+      {
+        return new Rectangle(CurrentMouse.X + (int)_camera.Position.X, CurrentMouse.Y + (int)_camera.Position.Y, 1, 1);
+      }
+    }
+
     public Rectangle MouseRectangle
     {
       get
       {
-        return new Rectangle(_currentMouse.X + (int)_camera.Position.X, _currentMouse.Y + (int)_camera.Position.Y, 1, 1);
+        return new Rectangle(CurrentMouse.X, CurrentMouse.Y, 1, 1);
       }
     }
 
     public Pathfinder Pathfinder { get; private set; }
+
+    public MouseState PreviousMouse { get; private set; }
 
     public int UnemploymentCount
     {
@@ -136,6 +146,11 @@ namespace PleaseThem.States
       spriteBatch.End();
     }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="graphiceDevice"></param>
+    /// <param name="content"></param>
     public GameState(GraphicsDevice graphiceDevice, ContentManager content)
       : base(content)
     {
@@ -158,12 +173,15 @@ namespace PleaseThem.States
 
       Vector2 hallPosition = new Vector2(x, y);
 
+      _menu = new Menu(Content, this);
+
       Components = new List<Component>()
       {
         new Hall(this, content.Load<Texture2D>("Buildings/Hall"))
         {
           Position = hallPosition,
         },
+        _menu,
       };
 
       Map.CleanArea(new Vector2(hallPosition.X + 80, hallPosition.Y + 80), 10);
@@ -201,8 +219,8 @@ namespace PleaseThem.States
     {
       if (_buildingList.SelectedBuilding != null)
       {
-        if (_currentMouse.LeftButton == ButtonState.Pressed &&
-            _previousMouse.LeftButton == ButtonState.Released)
+        if (CurrentMouse.LeftButton == ButtonState.Pressed &&
+            PreviousMouse.LeftButton == ButtonState.Released)
         {
           bool canBuild = true;
 
@@ -213,6 +231,9 @@ namespace PleaseThem.States
               if (component == _buildingList.SelectedBuilding)
                 break;
             }
+
+            if (component is Menu)
+              break;
 
             var building = component as Models.Sprite;
             if (building.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
@@ -287,8 +308,8 @@ namespace PleaseThem.States
       _previousKeyboard = _currentKeyboard;
       _currentKeyboard = Keyboard.GetState();
 
-      _previousMouse = _currentMouse;
-      _currentMouse = Mouse.GetState();
+      PreviousMouse = CurrentMouse;
+      CurrentMouse = Mouse.GetState();
     }
 
     public override void Update(GameTime gameTime)
@@ -332,7 +353,7 @@ namespace PleaseThem.States
       }
 
       // If we're not on the interface stuff
-      if (_currentMouse.Y >= 16 && _currentMouse.Y < (Game1.ScreenHeight - 64))
+      if (CurrentMouse.Y >= 16 && CurrentMouse.Y < (Game1.ScreenHeight - 64))
       {
         PlaceBuilding();
       }

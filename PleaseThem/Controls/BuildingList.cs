@@ -77,8 +77,8 @@ namespace PleaseThem.Controls
           b.Selected = false;
       }
 
-      int x = (int)Math.Floor(_parent.MouseRectangle.X / 32m) * Map.TileSize;
-      int y = (int)Math.Floor(_parent.MouseRectangle.Y / 32m) * Map.TileSize;
+      int x = (int)Math.Floor(_parent.MouseRectangleWithCamera.X / 32m) * Map.TileSize;
+      int y = (int)Math.Floor(_parent.MouseRectangleWithCamera.Y / 32m) * Map.TileSize;
 
       var position = new Vector2(x, y);
 

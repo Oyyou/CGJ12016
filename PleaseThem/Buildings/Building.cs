@@ -18,12 +18,6 @@ namespace PleaseThem.Buildings
   {
     #region Fields
 
-    protected MouseState _currentMouse;
-
-    protected Menu _menu { get; private set; }
-
-    protected MouseState _previousMouse;
-
     #endregion
 
     #region Properties
@@ -37,6 +31,14 @@ namespace PleaseThem.Buildings
     }
 
     public Color Color { get; set; } = Color.White;
+
+    public virtual string[] Content
+    {
+      get
+      {
+        return new string[] { $"Workers: {CurrentMinions}/{MaxMinions}" };
+      }
+    }
 
     public int CurrentMinions { get { return Minions.Count; } }
 
@@ -72,7 +74,6 @@ namespace PleaseThem.Buildings
       : base(parent, texture)
     {
       Minions = new List<Actors.Minion>();
-      _menu = new Menu(parent.Content);
 
       DefaultLayer = 0.7f;
 
@@ -82,8 +83,6 @@ namespace PleaseThem.Buildings
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
-
-      _menu.Draw(spriteBatch, Rectangle);
     }
 
     public void Employ(Actors.Minion minion)
@@ -118,27 +117,19 @@ namespace PleaseThem.Buildings
       if (MinionColor == new Color(0, 0, 0, 0))
         throw new Exception("Please set 'Color' on this building: " + this.GetType().ToString());
 
-      _previousMouse = _currentMouse;
-      _currentMouse = Mouse.GetState();
       LeftClicked = false;
       RightClicked = false;
 
-      if (_parent.MouseRectangle.Intersects(Rectangle))
+      if (_parent.MouseRectangleWithCamera.Intersects(Rectangle))
       {
-        if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
+        if (_parent.CurrentMouse.LeftButton == ButtonState.Pressed && _parent.PreviousMouse.LeftButton == ButtonState.Released)
           LeftClicked = true;
 
-        if (_currentMouse.RightButton == ButtonState.Pressed && _previousMouse.RightButton == ButtonState.Released)
+        if (_parent.CurrentMouse.RightButton == ButtonState.Pressed && _parent.PreviousMouse.RightButton == ButtonState.Released)
           RightClicked = true;
-
-        _menu.IsVisible = true;
-      }
-      else
-      {
-        _menu.IsVisible = false;
       }
 
-      if (_currentMouse.Y >= 32 && _currentMouse.Y < (Game1.ScreenHeight - 64))
+      if (_parent.MouseRectangle.Y >= 32 && _parent.MouseRectangle.Y < (Game1.ScreenHeight - 64))
       {
         if (LeftClicked)
         {
@@ -170,8 +161,6 @@ namespace PleaseThem.Buildings
           }
         }
       }
-
-      _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
 
     #endregion

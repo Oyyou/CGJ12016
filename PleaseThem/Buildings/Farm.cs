@@ -22,6 +22,8 @@ namespace PleaseThem.Buildings
   {
     public List<FarmPosition> FarmPositions { get; set; }
 
+    public override string[] Content => new string[] { $"Workers: {CurrentMinions}/{MaxMinions}" };
+
     public override Rectangle CollisionRectangle
     {
       get
@@ -86,8 +88,6 @@ namespace PleaseThem.Buildings
     public override void Update(GameTime gameTime)
     {
       base.Update(gameTime);
-
-      _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
   }
 }

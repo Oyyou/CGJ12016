@@ -20,15 +20,17 @@ namespace PleaseThem.Controls
 
     private Texture2D _texture;
 
-    public Rectangle Rectangle { get; private set; }
+    public event EventHandler Click;
+
+    public Color Color { get; set; }
 
     public bool IsClicked { get; private set; }
 
     public bool IsHovering { get; private set; }
 
-    public Color Color { get; set; }
-
     public Vector2 Position;
+
+    public Rectangle Rectangle { get; private set; }
 
     public bool Selected { get; set; }
 

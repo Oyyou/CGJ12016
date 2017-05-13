@@ -18,6 +18,8 @@ namespace PleaseThem
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
+    private List<State> _states;
+
     public GameState GameState;
 
     public MenuState MenuState;
@@ -51,9 +53,15 @@ namespace PleaseThem
       ScreenWidth = graphics.PreferredBackBufferWidth;
 
       Window.AllowUserResizing = true;
+      //graphics.PreparingDeviceSettings += Graphics_PreparingDeviceSettings;
       Window.ClientSizeChanged += Window_ClientSizeChanged;
 
       base.Initialize();
+    }
+
+    private void Graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
+    {
+      e.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
     }
 
     private void Window_ClientSizeChanged(object sender, EventArgs e)
@@ -102,6 +110,12 @@ namespace PleaseThem
       MenuState = new MenuState(Content);
       GameState = new GameState(graphics.GraphicsDevice, Content);
 
+      _states = new List<State>()
+      {
+        new MenuState(Content){ IsActive = true, },
+        new GameState(graphics.GraphicsDevice, Content),
+      };
+
       MenuState.IsActive = true;
     }
 
@@ -123,6 +137,9 @@ namespace PleaseThem
     {
       base.Update(gameTime);
 
+      //graphics.PreferredBackBufferWidth+=10;
+      //graphics.ApplyChanges();
+
       if (MenuState.IsActive)
       {
         MenuState.Update(gameTime);
@@ -138,7 +155,7 @@ namespace PleaseThem
         if (MenuState.Quit)
           this.Exit();
       }
-      else if(GameState.IsActive)
+      else if (GameState.IsActive)
       {
         GameState.Update(gameTime);
 

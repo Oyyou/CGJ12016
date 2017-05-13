@@ -22,6 +22,8 @@ namespace PleaseThem.Buildings
       }
     }
 
+    public override string[] Content => new string[] { $"Minions: {CurrentMinions}/{MaxMinions}" };
+
     public Mining(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
@@ -40,8 +42,6 @@ namespace PleaseThem.Buildings
     public override void Update(GameTime gameTime)
     {
       base.Update(gameTime);
-
-      _menu.Update($"Workers: {CurrentMinions}/{MaxMinions}");
     }
   }
 }

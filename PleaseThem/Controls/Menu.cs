@@ -6,49 +6,57 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using PleaseThem.States;
+using PleaseThem.Buildings;
 
 namespace PleaseThem.Controls
 {
-  public class Menu
+  public class Menu : Component
   {
-    private string[] _content;
-
     private SpriteFont _font;
+
+    private GameState _parent;
 
     private Rectangle _rectangle;
 
     private Texture2D _texture;
 
-    public bool IsVisible { get; set; }
-
-    public Menu(ContentManager Content)
+    public Menu(ContentManager Content, GameState parent)
     {
       _texture = Content.Load<Texture2D>("Controls/Menu");
       _font = Content.Load<SpriteFont>("Fonts/Arial08pt");
 
-      IsVisible = false;
+      _parent = parent;
     }
 
-    public void Update(params string[] content)
+    public override void Update(GameTime gameTime)
     {
-      _content = content;
+
     }
 
-    public void Draw(SpriteBatch spriteBatch, Rectangle parent)
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      if (!IsVisible)
+      var building = _parent.Components
+        .Where(c => c is Building)
+        .Where(c => ((Building)c).IsHovering)
+        .FirstOrDefault() as Building;
+
+      if (building == null)
         return;
 
-      _rectangle = new Rectangle(parent.X + (Math.Abs(parent.Width - _texture.Width) / 2),
-                                 parent.Y - 5 - _texture.Height, _texture.Width, _texture.Height);
+      if (building.Content.Count() == 0)
+        return;
+
+      _rectangle = new Rectangle(building.Rectangle.X + ((building.Width - _texture.Width) / 2),
+                                 building.Rectangle.Y - 5 - _texture.Height, _texture.Width, _texture.Height);
 
       if (_rectangle.Y < 32)
-        _rectangle.Y = (parent.Bottom - 32) + 5; // The 32 is the 'whitespace' I have under buildings.
+        _rectangle.Y = (building.Rectangle.Bottom - 32) + 5; // The 32 is the 'whitespace' I have under buildings.
 
       spriteBatch.Draw(_texture, _rectangle, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0.85f);
 
       Vector2 fontPosition = new Vector2(_rectangle.X + 10, _rectangle.Y + 10);
-      foreach (var content in _content)
+      foreach (var content in building.Content)
       {
         spriteBatch.DrawString(_font, content, fontPosition, Color.Black, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0.9f);
 

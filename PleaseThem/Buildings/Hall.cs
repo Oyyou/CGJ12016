@@ -21,6 +21,12 @@ namespace PleaseThem.Buildings
       }
     }
 
+    public override string[] Content => new string[]
+    {
+      $"Unemployed Minions: {_parent.UnemploymentCount}",
+      $"Total Minions: {_parent.MinionCount}"
+    };
+
     public Hall(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
@@ -40,9 +46,6 @@ namespace PleaseThem.Buildings
     public override void Update(GameTime gameTime)
     {
       base.Update(gameTime);
-
-      _menu.Update($"Unemployed Minions: {_parent.UnemploymentCount}",
-                   $"Total Minions: {_parent.MinionCount}");
     }
   }
 }

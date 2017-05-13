@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using PleaseThem.Controllers;
 using PleaseThem.Core;
 using PleaseThem.States;
@@ -43,6 +44,14 @@ namespace PleaseThem.Models
       }
     }
 
+    public bool IsHovering
+    {
+      get
+      {
+        return _parent.MouseRectangleWithCamera.Intersects(Rectangle);
+      }
+    }
+
     public bool IsVisible { get; set; }
 
     public float Layer
@@ -80,6 +89,28 @@ namespace PleaseThem.Models
       }
     }
 
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      if (!IsVisible)
+        return;
+
+      if (_texture != null)
+      {
+        spriteBatch.Draw(_texture, Position, null, Colour, Rotation, new Vector2(0, 0), 1, SpriteEffects.None, Layer);
+      }
+      else if (_animationController != null)
+      {
+        _animationPlayer.Colour = Colour;
+        _animationPlayer.Draw(gameTime, spriteBatch, Position);
+      }
+    }
+
+    private void Initialize()
+    {
+      IsVisible = true;
+      Colour = Color.White;
+    }
+
     public Sprite(GameState parent, Texture2D texture)
     {
       _parent = parent;
@@ -100,31 +131,9 @@ namespace PleaseThem.Models
       Initialize();
     }
 
-    private void Initialize()
-    {
-      IsVisible = true;
-      Colour = Color.White;
-    }
-
     public override void Update(GameTime gameTime)
     {
 
-    }
-
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-      if (!IsVisible)
-        return;
-
-      if (_texture != null)
-      {
-        spriteBatch.Draw(_texture, Position, null, Colour, Rotation, new Vector2(0, 0), 1, SpriteEffects.None, Layer);
-      }
-      else if (_animationController != null)
-      {
-        _animationPlayer.Colour = Colour;
-        _animationPlayer.Draw(gameTime, spriteBatch, Position);
-      }
     }
   }
 }

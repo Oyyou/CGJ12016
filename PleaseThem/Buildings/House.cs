@@ -22,6 +22,8 @@ namespace PleaseThem.Buildings
       }
     }
 
+    public override string[] Content => new string[0];
+
     public House(GameState parent, Texture2D texture)
       : base(parent, texture)
     {
@@ -41,7 +43,6 @@ namespace PleaseThem.Buildings
 
     public override void Update(GameTime gameTime)
     {
-      _menu.Update($"Minions: {CurrentMinions}/{MaxMinions}");
     }
   }
 }
