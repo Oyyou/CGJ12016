@@ -98,6 +98,7 @@ namespace PleaseThem.Controls
         if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
         {
           IsClicked = true;
+          Click(this, new EventArgs());
         }
       }
     }

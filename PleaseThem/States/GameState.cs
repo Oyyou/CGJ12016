@@ -36,8 +36,6 @@ namespace PleaseThem.States
 
     private bool _isPaused = false;
 
-    private GraphicsDevice _graphicsDevice;
-
     private Menu _menu;
 
     private KeyboardState _previousKeyboard;
@@ -49,8 +47,6 @@ namespace PleaseThem.States
     #region Properties
 
     public List<Component> Components { get; private set; }
-
-    public ContentManager Content;
 
     public MouseState CurrentMouse { get; private set; }
 
@@ -105,9 +101,9 @@ namespace PleaseThem.States
         Components.Add(new Minion(this,
           new Controllers.AnimationController()
           {
-            WalkDown = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingDown"), 4, 0.2f, true),
-            WalkRight = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingRight"), 4, 0.2f, true),
-            WalkUp = new Animation(Content.Load<Texture2D>("Actors/Minion/WalkingUp"), 4, 0.2f, true),
+            WalkDown = new Animation(_content.Load<Texture2D>("Actors/Minion/WalkingDown"), 4, 0.2f, true),
+            WalkRight = new Animation(_content.Load<Texture2D>("Actors/Minion/WalkingRight"), 4, 0.2f, true),
+            WalkUp = new Animation(_content.Load<Texture2D>("Actors/Minion/WalkingUp"), 4, 0.2f, true),
           })
         {
           Position = building.DoorPosition,
@@ -146,20 +142,13 @@ namespace PleaseThem.States
       spriteBatch.End();
     }
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="graphiceDevice"></param>
-    /// <param name="content"></param>
-    public GameState(GraphicsDevice graphiceDevice, ContentManager content)
-      : base(content)
+    public GameState(Game1 game, GraphicsDevice graphicsDevice, ContentManager content)
+      : base(game, graphicsDevice, content)
     {
-      _graphicsDevice = graphiceDevice;
-      Content = content;
 
-      _buildingList = new BuildingList(_graphicsDevice, Content, this);
+      _buildingList = new BuildingList(_graphicsDevice, base._content, this);
 
-      Map = new Map(Content, 100, 100);
+      Map = new Map(base._content, 100, 100);
 
       ResourceManager = new ResourceManager();
 
@@ -173,7 +162,7 @@ namespace PleaseThem.States
 
       Vector2 hallPosition = new Vector2(x, y);
 
-      _menu = new Menu(Content, this);
+      _menu = new Menu(content, this);
 
       Components = new List<Component>()
       {
@@ -205,7 +194,7 @@ namespace PleaseThem.States
 
       GUIComponents = new List<Component>()
       {
-        new ResourceList(_graphicsDevice, Content.Load<SpriteFont>("Fonts/Arial08pt"), this),
+        new ResourceList(_graphicsDevice, content.Load<SpriteFont>("Fonts/Arial08pt"), this),
         _buildingList,
       };
 

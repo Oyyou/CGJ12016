@@ -11,21 +11,33 @@ namespace PleaseThem.States
 {
   public abstract class State
   {
-    public bool Next { get; set; }
-    public bool Quit { get; set; }
-    public bool IsActive { get; set; }
+    #region Fields 
 
-    public State(ContentManager Content)
-    {
-      Next = false;
-      Quit = false;
-      IsActive = false;
-    }
+    protected ContentManager _content;
+
+    protected GraphicsDevice _graphicsDevice;
+
+    protected Game1 _game;
+
+    #endregion
+
+    #region Methods
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
     public abstract void PostUpdate(GameTime gameTime);
 
+    public State(Game1 game, GraphicsDevice graphicsDevice, ContentManager Content)
+    {
+      _game = game;
+
+      _graphicsDevice = graphicsDevice;
+
+      _content = Content;
+    }
+
     public abstract void Update(GameTime gameTime);
+
+    #endregion
   }
 }

@@ -18,11 +18,7 @@ namespace PleaseThem
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
-    private List<State> _states;
-
-    public GameState GameState;
-
-    public MenuState MenuState;
+    public State NextState { get; private set; }
 
     public static MessageBox MessageBox;
 
@@ -31,6 +27,13 @@ namespace PleaseThem
     public static int ScreenHeight;
 
     public static int ScreenWidth;
+
+    public State State { get; private set; }
+
+    public void ChangeState(State state)
+    {
+      NextState = state;
+    }
 
     public Game1()
     {
@@ -107,16 +110,7 @@ namespace PleaseThem
 
       Random = new Random();
 
-      MenuState = new MenuState(Content);
-      GameState = new GameState(graphics.GraphicsDevice, Content);
-
-      _states = new List<State>()
-      {
-        new MenuState(Content){ IsActive = true, },
-        new GameState(graphics.GraphicsDevice, Content),
-      };
-
-      MenuState.IsActive = true;
+      State = new MenuState(this, graphics.GraphicsDevice, Content);
     }
 
     /// <summary>
@@ -137,36 +131,15 @@ namespace PleaseThem
     {
       base.Update(gameTime);
 
-      //graphics.PreferredBackBufferWidth+=10;
-      //graphics.ApplyChanges();
-
-      if (MenuState.IsActive)
+      if (NextState != null)
       {
-        MenuState.Update(gameTime);
-
-        MenuState.PostUpdate(gameTime);
-
-        if (MenuState.Next)
-        {
-          MenuState.IsActive = false;
-          GameState.IsActive = true;
-        }
-
-        if (MenuState.Quit)
-          this.Exit();
+        State = NextState;
+        NextState = null;
       }
-      else if (GameState.IsActive)
-      {
-        GameState.Update(gameTime);
 
-        GameState.PostUpdate(gameTime);
+      State.Update(gameTime);
 
-        if (GameState.Quit)
-        {
-          GameState.IsActive = false;
-          MenuState.IsActive = true;
-        }
-      }
+      State.PostUpdate(gameTime);
 
       MessageBox.Update(gameTime);
     }
@@ -179,14 +152,7 @@ namespace PleaseThem
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      if (MenuState.IsActive)
-      {
-        MenuState.Draw(gameTime, spriteBatch);
-      }
-      else if (GameState.IsActive)
-      {
-        GameState.Draw(gameTime, spriteBatch);
-      }
+      State.Draw(gameTime, spriteBatch);
 
       spriteBatch.Begin();
       MessageBox.Draw(spriteBatch);

@@ -12,15 +12,41 @@ namespace PleaseThem.States
 {
   public class MenuState : State
   {
-    private Texture2D _texture;
-    private Vector2 _position;
+    #region Fields
+    private List<Button> _buttons;
+
+    private Button _loadGame;
 
     private Button _newGame;
-    private Button _loadGame;
-    private Button _quit;
 
-    public MenuState(ContentManager Content)
-      : base(Content)
+    private Vector2 _position;
+
+    private Texture2D _texture;
+
+    private Button _quit;
+    #endregion
+
+    #region Methods
+
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+      spriteBatch.Begin();
+
+      spriteBatch.Draw(_texture, _position, Color.White);
+
+      foreach (var button in _buttons)
+        button.Draw(spriteBatch);
+
+      spriteBatch.End();
+    }
+
+    private void LoadGameClick(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    public MenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager Content)
+      : base(game, graphicsDevice, Content)
     {
       _texture = Content.Load<Texture2D>("Background");
       _position = new Vector2(0, 0);
@@ -33,43 +59,42 @@ namespace PleaseThem.States
       _quit = new Button(buttonTexture, font, new Vector2(336, 400));
 
       _newGame.Text = "New Game";
-      _loadGame.Text = "New Game";
+      _loadGame.Text = "Load Game";
       _quit.Text = "Quit";
 
-      _newGame.Click += _newGame_Click;
+      _newGame.Click += NewGameClick;
+      _loadGame.Click += LoadGameClick;
+      _quit.Click += QuitClick;
+
+      _buttons = new List<Button>()
+      {
+        _newGame,
+        _loadGame,
+        _quit,
+      };
     }
 
-    private void _newGame_Click(object sender, EventArgs e)
+    private void NewGameClick(object sender, EventArgs e)
     {
-      throw new NotImplementedException();
+      _game.ChangeState(new GameState(_game, _graphicsDevice, _content));
     }
 
     public override void PostUpdate(GameTime gameTime)
     {
-      
+
     }
 
     public override void Update(GameTime gameTime)
     {
-      _newGame.Update();
-      _loadGame.Update();
-      _quit.Update();
-
-      Next = _newGame.IsClicked;
-
-      Quit = _quit.IsClicked;
+      foreach (var button in _buttons)
+        button.Update();
     }
 
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    private void QuitClick(object sender, EventArgs e)
     {
-      spriteBatch.Begin();
-
-      spriteBatch.Draw(_texture, _position, Color.White);
-
-      _newGame.Draw(spriteBatch);
-      _quit.Draw(spriteBatch);
-
-      spriteBatch.End();
+      throw new NotImplementedException();
     }
+
+    #endregion
   }
 }
