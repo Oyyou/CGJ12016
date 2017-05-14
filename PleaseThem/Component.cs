@@ -14,6 +14,8 @@ namespace PleaseThem
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
+    public abstract string GetComponentData();
+
     public abstract void Update(GameTime gameTime);
 
     public object Clone()

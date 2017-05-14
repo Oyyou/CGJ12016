@@ -56,6 +56,11 @@ namespace PleaseThem.Controls
       //_buttons.Add(_house = new Button(parent, buttonTexture, font) { Position = new Vector2(_farm.Rectangle.Right + 10, 470 - buttonTexture.Height), Text = "House" });
     }
 
+    public override string GetComponentData()
+    {
+      return "--BuildingList--";
+    }
+
     public override void Update(GameTime gameTime)
     {
       _rectangle = new Rectangle(0, Game1.ScreenHeight - _height, Game1.ScreenWidth, _height);

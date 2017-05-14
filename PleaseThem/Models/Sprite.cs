@@ -105,6 +105,11 @@ namespace PleaseThem.Models
       }
     }
 
+    public override string GetComponentData()
+    {
+      return "--Sprite--";
+    }
+
     private void Initialize()
     {
       IsVisible = true;

@@ -133,7 +133,10 @@ namespace PleaseThem
 
       if (NextState != null)
       {
+        State.UnloadContent();
+
         State = NextState;
+
         NextState = null;
       }
 

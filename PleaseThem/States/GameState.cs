@@ -13,6 +13,8 @@ using PleaseThem.Core;
 using PleaseThem.Actors;
 using PleaseThem.Managers;
 using PleaseThem.Buildings.Government;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace PleaseThem.States
 {
@@ -301,9 +303,33 @@ namespace PleaseThem.States
       CurrentMouse = Mouse.GetState();
     }
 
+    public override void UnloadContent()
+    {
+
+    }
+
     public override void Update(GameTime gameTime)
     {
+      if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
+      {
+        using (var writer = new StreamWriter("data.txt", false))
+        {
+          foreach (var component in Components)
+          {
+            foreach (var data in component.GetComponentData().Split('\n'))
+            {
+              writer.WriteLine(data);
+            }
+          }
+        }
+      }
+
       SetInput();
+
+      if (_currentKeyboard.IsKeyUp(Keys.Escape) && _previousKeyboard.IsKeyDown(Keys.Escape))
+      {
+        _game.ChangeState(new MenuState(_game, _graphicsDevice, _content));
+      }
 
       if (_currentKeyboard.IsKeyUp(Keys.Space) && _previousKeyboard.IsKeyDown(Keys.Space))
       {

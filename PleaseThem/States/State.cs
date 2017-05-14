@@ -36,6 +36,8 @@ namespace PleaseThem.States
       _content = Content;
     }
 
+    public abstract void UnloadContent();
+
     public abstract void Update(GameTime gameTime);
 
     #endregion
