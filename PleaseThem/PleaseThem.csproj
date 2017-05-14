@@ -58,6 +58,7 @@
     <Compile Include="Core\Camera.cs" />
     <Compile Include="Core\Pathfinder.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="ISaveable.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Managers\JobManager.cs" />
     <Compile Include="Managers\MinionManager.cs" />

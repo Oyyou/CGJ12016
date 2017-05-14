@@ -13,6 +13,7 @@ using PleaseThem.Core;
 using PleaseThem.Actors;
 using PleaseThem.Managers;
 using PleaseThem.Buildings.Government;
+using System.IO;
 
 namespace PleaseThem.States
 {
@@ -204,6 +205,14 @@ namespace PleaseThem.States
       MaximumMinions = 10;
     }
 
+    public void LoadGame()
+    {
+      using (var reader = new StreamReader("data.txt"))
+      {
+        var line = reader.ReadLine();
+      }
+    }
+
     private void PlaceBuilding()
     {
       if (_buildingList.SelectedBuilding != null)
@@ -292,6 +301,27 @@ namespace PleaseThem.States
       }
     }
 
+    public void SaveGame()
+    {
+      using (var writer = new StreamWriter("data.txt"))
+      {
+        foreach (var component in Components)
+        {
+          var data = component.GetSaveData();
+
+          if (string.IsNullOrEmpty(data))
+            continue;
+
+          var values = data.Split('\n');
+
+          foreach (var value in values)
+          {
+            writer.WriteLine(value);
+          }
+        }
+      }
+    }
+
     private void SetInput()
     {
       _previousKeyboard = _currentKeyboard;
@@ -303,6 +333,16 @@ namespace PleaseThem.States
 
     public override void Update(GameTime gameTime)
     {
+      if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
+      {
+        SaveGame();
+      }
+
+      if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
+      {
+        LoadGame();
+      }
+
       SetInput();
 
       if (_currentKeyboard.IsKeyUp(Keys.Space) && _previousKeyboard.IsKeyDown(Keys.Space))

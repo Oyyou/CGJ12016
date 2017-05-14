@@ -13,6 +13,8 @@ namespace PleaseThem.Controls
 {
   public class Menu : Component
   {
+    #region Fields
+
     private SpriteFont _font;
 
     private GameState _parent;
@@ -21,18 +23,9 @@ namespace PleaseThem.Controls
 
     private Texture2D _texture;
 
-    public Menu(ContentManager Content, GameState parent)
-    {
-      _texture = Content.Load<Texture2D>("Controls/Menu");
-      _font = Content.Load<SpriteFont>("Fonts/Arial08pt");
+    #endregion
 
-      _parent = parent;
-    }
-
-    public override void Update(GameTime gameTime)
-    {
-
-    }
+    #region Methods
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -65,5 +58,26 @@ namespace PleaseThem.Controls
         fontPosition.Y += y + 5;
       }
     }
+
+    public override string GetSaveData()
+    {
+      return "";
+    }
+
+    public Menu(ContentManager Content, GameState parent)
+    {
+      _texture = Content.Load<Texture2D>("Controls/Menu");
+
+      _font = Content.Load<SpriteFont>("Fonts/Arial08pt");
+
+      _parent = parent;
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+
+    }
+
+    #endregion
   }
 }

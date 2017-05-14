@@ -193,6 +193,15 @@ namespace PleaseThem
         tile.Draw(spriteBatch);
     }
 
+    public override string GetSaveData()
+    {
+      var data = "--Map--";
+
+
+
+      return data;
+    }
+
     /// <summary>
     /// Returns the tile index for the given cell.
     /// </summary>

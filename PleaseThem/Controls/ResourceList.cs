@@ -11,6 +11,8 @@ namespace PleaseThem.Controls
 {
   public class ResourceList : Component
   {
+    #region Fields
+
     private SpriteFont _font;
 
     private GameState _parent;
@@ -19,10 +21,19 @@ namespace PleaseThem.Controls
 
     private Texture2D _texture;
 
+    #endregion
+
+    #region Methods
+
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.Draw(_texture, _rectangle, Color.White);
       spriteBatch.DrawString(_font, $"Food: {_parent.ResourceManager.Food} | Wood: {_parent.ResourceManager.Wood} | Stone: {_parent.ResourceManager.Stone} | Gold: {_parent.ResourceManager.Gold}", new Vector2(5, 3), Color.Red);
+    }
+
+    public override string GetSaveData()
+    {
+      return "";
     }
 
     public ResourceList(GraphicsDevice graphicsDevice, SpriteFont font, GameState parent)
@@ -38,5 +49,7 @@ namespace PleaseThem.Controls
     {
       _rectangle = new Rectangle(0, 0, Game1.ScreenWidth, 16);
     }
+
+    #endregion
   }
 }

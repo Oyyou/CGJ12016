@@ -67,7 +67,7 @@ namespace PleaseThem.Models
     }
 
     public Vector2 Position { get; set; }
-    
+
     public Rectangle Rectangle
     {
       get
@@ -103,6 +103,29 @@ namespace PleaseThem.Models
         _animationPlayer.Colour = Colour;
         _animationPlayer.Draw(gameTime, spriteBatch, Position);
       }
+    }
+
+    public override string GetSaveData()
+    {
+      var data = "--Sprite--";
+
+      if (_animationController != null)
+        data += _animationController.GetSaveData();
+
+      if (_texture != null)
+        data += $"\nTexture={_texture.Name}";
+
+      data += $"\nColour={Colour}";
+
+      data += $"\nDefaultLayer={DefaultLayer}";
+
+      data += $"\nIsVisible={IsVisible}";
+
+      data += $"\nPosition={Position.X}|{Position.Y}";
+
+      data += $"\nRotation={Rotation}";
+
+      return data;
     }
 
     private void Initialize()
