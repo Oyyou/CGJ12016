@@ -92,7 +92,7 @@ namespace PleaseThem.States
 
     private void QuitClick(object sender, EventArgs e)
     {
-      throw new NotImplementedException();
+      _game.Exit();
     }
 
     #endregion

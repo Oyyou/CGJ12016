@@ -21,6 +21,12 @@ namespace PleaseThem.States
 
     #endregion
 
+    #region Properties
+
+    public Color BackgroundColour { get; protected set; }
+
+    #endregion
+
     #region Methods
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
@@ -34,6 +40,8 @@ namespace PleaseThem.States
       _graphicsDevice = graphicsDevice;
 
       _content = content;
+
+      BackgroundColour = Color.Black;
     }
 
     public abstract void Update(GameTime gameTime);
