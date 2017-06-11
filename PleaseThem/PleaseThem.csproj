@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="Actors\Minion.cs" />
     <Compile Include="Buildings\Building.cs" />
+    <Compile Include="Buildings\SwordSchool.cs" />
     <Compile Include="Buildings\Hall.cs" />
     <Compile Include="Buildings\House.cs" />
     <Compile Include="Buildings\Farm.cs" />

@@ -53,6 +53,22 @@ namespace PleaseThem.Actors
 
     #region Methods
 
+    private void CombatTraining(GameTime gameTime)
+    {
+      var swordSchool = Workplace as SwordSchool;
+
+      if (Target == Vector2.Zero)
+      {
+        var position = swordSchool.BuildingPositions.Where(c => !c.HasWorker).FirstOrDefault();
+        position.HasWorker = true;
+
+        Target = position.Positions[0];
+      }
+
+      if (Target != Position)
+        Move(Target);
+    }
+
     private void Farming(GameTime gameTime)
     {
       var farm = Workplace as Farm;
@@ -259,6 +275,13 @@ namespace PleaseThem.Actors
       if (Workplace.TileType == Tiles.TileType.Farm)
       {
         Farming(gameTime);
+
+        return;
+      }
+
+      if (Workplace.TileType == TileType.Militia)
+      {
+        CombatTraining(gameTime);
 
         return;
       }

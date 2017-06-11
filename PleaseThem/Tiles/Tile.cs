@@ -14,6 +14,7 @@ namespace PleaseThem.Tiles
     Tree,
     Stone,
     Farm,
+    Militia,
     Occupied,
   }
 

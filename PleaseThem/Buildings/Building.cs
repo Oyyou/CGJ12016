@@ -156,8 +156,12 @@ namespace PleaseThem.Buildings
           if (CurrentMinions > 0)
           {
             Unemploy();
+
             if (this is Farm)
               ((Farm)this).FarmPositions.Where(c => c.HasWorker).Last().HasWorker = false;
+
+            if (this is SwordSchool)
+              ((SwordSchool)this).BuildingPositions.Where(c => c.HasWorker).Last().HasWorker = false;
           }
         }
       }

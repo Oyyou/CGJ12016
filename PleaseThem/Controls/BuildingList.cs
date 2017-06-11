@@ -34,6 +34,8 @@ namespace PleaseThem.Controls
 
     private Rectangle _rectangle;
 
+    private Button _swordSchool;
+
     private Texture2D _texture;
 
     #endregion
@@ -94,6 +96,7 @@ namespace PleaseThem.Controls
       _buttons.Add(_mining = new Button(buttonTexture, font, new Vector2(_lumber.Rectangle.Right + 10, 470 - buttonTexture.Height), "Mining"));
       _buttons.Add(_farm = new Button(buttonTexture, font, new Vector2(_mining.Rectangle.Right + 10, 470 - buttonTexture.Height), "Farm"));
       _buttons.Add(_house = new Button(buttonTexture, font, new Vector2(_farm.Rectangle.Right + 10, 470 - buttonTexture.Height), "House"));
+      _buttons.Add(_swordSchool = new Button(buttonTexture, font, new Vector2(_house.Rectangle.Right + 10, 470 - buttonTexture.Height), "Sword School"));
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -150,6 +153,10 @@ namespace PleaseThem.Controls
       else if (_house.IsClicked)
       {
         ButtonClick(_house, new House(_parent, _content.Load<Texture2D>("Buildings/House")));
+      }
+      else if (_swordSchool.IsClicked)
+      {
+        ButtonClick(_swordSchool, new SwordSchool(_parent, _content.Load<Texture2D>("Buildings/SwordSchool")));
       }
 
       if (SelectedBuilding != null)

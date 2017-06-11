@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Buildings
 {
-  public class FarmPosition
+  public class BuildingPosition
   {
     public bool HasWorker { get; set; }
     public List<Vector2> Positions { get; set; }
@@ -20,7 +20,7 @@ namespace PleaseThem.Buildings
 
   public class Farm : Building
   {
-    public List<FarmPosition> FarmPositions { get; set; }
+    public List<BuildingPosition> FarmPositions { get; set; }
 
     public override string[] Content => new string[] { $"Workers: {CurrentMinions}/{MaxMinions}" };
 
@@ -47,14 +47,14 @@ namespace PleaseThem.Buildings
       TileType = Tiles.TileType.Farm;
       MaxMinions = 3;
 
-      FarmPositions = new List<FarmPosition>();
+      FarmPositions = new List<BuildingPosition>();
     }
 
     public override void Initialise()
     {
       base.Initialise();
 
-      FarmPositions.Add(new FarmPosition()
+      FarmPositions.Add(new BuildingPosition()
       {
         HasWorker = false,
         Positions = new List<Vector2>()
@@ -64,7 +64,7 @@ namespace PleaseThem.Buildings
         },
       });
 
-      FarmPositions.Add(new FarmPosition()
+      FarmPositions.Add(new BuildingPosition()
       {
         HasWorker = false,
         Positions = new List<Vector2>()
@@ -74,7 +74,7 @@ namespace PleaseThem.Buildings
         },
       });
 
-      FarmPositions.Add(new FarmPosition()
+      FarmPositions.Add(new BuildingPosition()
       {
         HasWorker = false,
         Positions = new List<Vector2>()
