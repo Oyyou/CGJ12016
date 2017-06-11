@@ -20,6 +20,10 @@ namespace PleaseThem.Tiles
 
   public class Tile
   {
+    private bool _beenSeen = false;
+
+    public bool IsVisible = false;
+
     protected Texture2D Texture;
     public Vector2 Position { get; protected set; }
     public Rectangle Rectangle
@@ -28,6 +32,7 @@ namespace PleaseThem.Tiles
     }
 
     protected float Layer = 0.0f;
+
     public TileType TileType { get; protected set; }
 
     public Tile(Texture2D texture, Vector2 position, TileType tileType)
@@ -39,7 +44,26 @@ namespace PleaseThem.Tiles
 
     public void Draw(SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
+      var opcity = 0f;
+
+      if (!IsVisible)
+      {
+        if (!_beenSeen)
+        {
+          return;
+        }
+        else
+        {
+          opcity = 0.5f;
+        }
+      }
+      else
+      {
+        opcity = 1f;
+        _beenSeen = true;
+      }
+
+      spriteBatch.Draw(Texture, Position, null, Color.White * opcity, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
     }
   }
 }

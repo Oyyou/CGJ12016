@@ -13,6 +13,7 @@ using PleaseThem.Core;
 using PleaseThem.Actors;
 using PleaseThem.Managers;
 using System.IO;
+using PleaseThem.Models;
 
 namespace PleaseThem.States
 {
@@ -253,6 +254,18 @@ namespace PleaseThem.States
               }
             }
 
+            foreach (var tile in Map.BackgroundTiles)
+            {
+              if (tile.IsVisible)
+                continue;
+
+              if (tile.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+              {
+                canBuild = false;
+                break;
+              }
+            }
+
             if (!canBuild)
             {
               Game1.MessageBox.Show("Are you some kind of idiot?");
@@ -295,6 +308,30 @@ namespace PleaseThem.States
           Components.RemoveAt(i);
           i--;
         }
+      }
+
+      var validComponents = Components
+        .Where(c => !(c.Equals(_buildingList.SelectedBuilding)))
+        .Where(c => c is Sprite);
+
+      var distance = 448;
+
+      // Sigh - this is where 'Origin' would be useful!
+
+      foreach (var tile in Map.BackgroundTiles)
+      {
+        tile.IsVisible = false;
+
+        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
+          tile.IsVisible = true;
+      }
+
+      foreach (var tile in Map.ResourceTiles)
+      {
+        tile.IsVisible = false;
+
+        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
+          tile.IsVisible = true;
       }
     }
 
