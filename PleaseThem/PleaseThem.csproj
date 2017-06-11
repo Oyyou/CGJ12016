@@ -40,7 +40,6 @@
   <ItemGroup>
     <Compile Include="Actors\Minion.cs" />
     <Compile Include="Buildings\Building.cs" />
-    <Compile Include="Buildings\Government\TownHall.cs" />
     <Compile Include="Buildings\Hall.cs" />
     <Compile Include="Buildings\House.cs" />
     <Compile Include="Buildings\Farm.cs" />
@@ -59,15 +58,8 @@
     <Compile Include="Core\Pathfinder.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="ISaveable.cs" />
-    <Compile Include="Jobs\Job.cs" />
-    <Compile Include="Managers\JobManager.cs" />
-    <Compile Include="Managers\MinionManager.cs" />
     <Compile Include="Managers\ResourceManager.cs" />
     <Compile Include="Map.cs" />
-    <Compile Include="Models\Building.cs" />
-    <Compile Include="Models\Labour\LabourBuilding.cs" />
-    <Compile Include="Models\Labour\LumberMill.cs" />
-    <Compile Include="Models\Minion.cs" />
     <Compile Include="Models\Resource.cs" />
     <Compile Include="Models\Resources.cs" />
     <Compile Include="Models\Sprite.cs" />

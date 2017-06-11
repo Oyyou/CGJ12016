@@ -18,9 +18,9 @@ namespace PleaseThem
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
-    public State NextState { get; private set; }
-
     public static MessageBox MessageBox;
+
+    public State NextState { get; private set; }
 
     public static Random Random;
 

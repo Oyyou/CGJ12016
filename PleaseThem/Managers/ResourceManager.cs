@@ -12,6 +12,7 @@ namespace PleaseThem.Managers
     private Resources _resources;
 
     #region Properties
+
     public int Food
     {
       get { return _resources.Food; }
@@ -35,6 +36,7 @@ namespace PleaseThem.Managers
       get { return _resources.Gold; }
       private set { _resources.Gold = value; }
     }
+
     #endregion
 
     public ResourceManager()

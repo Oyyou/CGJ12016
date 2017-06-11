@@ -14,7 +14,7 @@ namespace PleaseThem.Buildings
 {
   public class FarmPosition
   {
-    public bool Working { get; set; }
+    public bool HasWorker { get; set; }
     public List<Vector2> Positions { get; set; }
   }
 
@@ -56,7 +56,7 @@ namespace PleaseThem.Buildings
 
       FarmPositions.Add(new FarmPosition()
       {
-        Working = false,
+        HasWorker = false,
         Positions = new List<Vector2>()
         {
           new Vector2(Position.X + 32, Rectangle.Top + 96),
@@ -66,7 +66,7 @@ namespace PleaseThem.Buildings
 
       FarmPositions.Add(new FarmPosition()
       {
-        Working = false,
+        HasWorker = false,
         Positions = new List<Vector2>()
         {
           new Vector2(Position.X + 96, Rectangle.Top),
@@ -76,7 +76,7 @@ namespace PleaseThem.Buildings
 
       FarmPositions.Add(new FarmPosition()
       {
-        Working = false,
+        HasWorker = false,
         Positions = new List<Vector2>()
         {
           new Vector2(Position.X + 160, Rectangle.Top),

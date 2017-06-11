@@ -157,7 +157,7 @@ namespace PleaseThem.Buildings
           {
             Unemploy();
             if (this is Farm)
-              ((Farm)this).FarmPositions.Where(c => c.Working).Last().Working = false;
+              ((Farm)this).FarmPositions.Where(c => c.HasWorker).Last().HasWorker = false;
           }
         }
       }

@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework.Input;
 using PleaseThem.Core;
 using PleaseThem.Actors;
 using PleaseThem.Managers;
-using PleaseThem.Buildings.Government;
 using System.IO;
 
 namespace PleaseThem.States
@@ -22,8 +21,6 @@ namespace PleaseThem.States
     #region Managers
 
     public ResourceManager ResourceManager;
-
-    public MinionManager MinionManager;
 
     #endregion
 
@@ -153,8 +150,6 @@ namespace PleaseThem.States
 
       ResourceManager = new ResourceManager();
 
-      MinionManager = new MinionManager();
-
       float x = Game1.Random.Next(64, (Map.Width * Map.TileSize) - 224); // 224 = HallWidth + 64. 64 = SpaceAroundEdges
       float y = Game1.Random.Next(64, (Map.Height * Map.TileSize) - 288);
 
@@ -210,6 +205,8 @@ namespace PleaseThem.States
       using (var reader = new StreamReader("data.txt"))
       {
         var line = reader.ReadLine();
+
+
       }
     }
 
@@ -338,7 +335,7 @@ namespace PleaseThem.States
         SaveGame();
       }
 
-      if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
+      if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
       {
         LoadGame();
       }

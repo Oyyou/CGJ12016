@@ -23,8 +23,6 @@ namespace PleaseThem.Actors
 
     private Vector2 _currentTarget;
 
-    private Vector2? _idlePosition = null;
-
     private bool _farmingDown;
 
     private Vector2 _farmPos1;
@@ -61,8 +59,8 @@ namespace PleaseThem.Actors
 
       if (_farmPos1 == Vector2.Zero)
       {
-        var farmPosition = farm.FarmPositions.Where(c => !c.Working).FirstOrDefault();
-        farmPosition.Working = true;
+        var farmPosition = farm.FarmPositions.Where(c => !c.HasWorker).FirstOrDefault();
+        farmPosition.HasWorker = true;
 
         _farmPos1 = farmPosition.Positions[0];
         _farmPos2 = farmPosition.Positions[1];
@@ -71,6 +69,7 @@ namespace PleaseThem.Actors
       if (!_atFarm)
       {
         Move(_farmPos1);
+
         if (Position == _farmPos1)
           _atFarm = true;
 
@@ -238,9 +237,6 @@ namespace PleaseThem.Actors
 
     public override void Update(GameTime gameTime)
     {
-      if (_idlePosition == null)
-        _idlePosition = Position;
-
       Reset();
 
       Work(gameTime);

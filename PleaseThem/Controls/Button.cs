@@ -57,11 +57,13 @@ namespace PleaseThem.Controls
     {
       if (!Selected)
       {
-        spriteBatch.Draw(_texture, Rectangle, Color.White);
-
         if (IsHovering)
         {
           spriteBatch.Draw(_texture, Rectangle, Color.Gray);
+        }
+        else
+        {
+          spriteBatch.Draw(_texture, Rectangle, Color.White);
         }
       }
       else
@@ -98,7 +100,8 @@ namespace PleaseThem.Controls
         if (_currentMouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
         {
           IsClicked = true;
-          Click(this, new EventArgs());
+                    
+          Click?.Invoke(this, new EventArgs());
         }
       }
     }
