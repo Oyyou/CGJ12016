@@ -90,6 +90,8 @@ namespace PleaseThem.Buildings
       minion.Workplace = this;
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
+      
+      minion.Work += Work;
 
       Minions.Add(minion);
     }
@@ -108,6 +110,8 @@ namespace PleaseThem.Buildings
 
       minion.Colour = Color.White;
       minion.Workplace = null;
+      
+      minion.Work -= Work;
 
       Minions.Remove(minion);
     }
@@ -165,6 +169,11 @@ namespace PleaseThem.Buildings
           }
         }
       }
+    }
+    
+    private virtual void Work(object sender, EventArgs e)
+    {
+      throw new NotImplementedException("Need to implement 'Work' for building.");
     }
 
     #endregion
