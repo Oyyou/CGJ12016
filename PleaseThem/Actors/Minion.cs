@@ -50,6 +50,12 @@ namespace PleaseThem.Actors
     public event EventHandler Work { get; set; }
 
     public Building Workplace { get; set; }
+    
+    public Vector2 Velocity
+    {
+      get { return _velocity; }
+      set { _velocity = value; }
+    }
 
     #endregion
 
@@ -139,7 +145,7 @@ namespace PleaseThem.Actors
       Layer = 0.8f;
     }
 
-    private void Move(Vector2 target)
+    public void Move(Vector2 target)
     {
       float speed = 2f;
 
