@@ -12,7 +12,8 @@ using Microsoft.Xna.Framework.Input;
 using PleaseThem.Core;
 using PleaseThem.Actors;
 using PleaseThem.Managers;
-using PleaseThem.Buildings.Government;
+using System.IO;
+using PleaseThem.Models;
 
 namespace PleaseThem.States
 {
@@ -21,8 +22,6 @@ namespace PleaseThem.States
     #region Managers
 
     public ResourceManager ResourceManager;
-
-    public MinionManager MinionManager;
 
     #endregion
 
@@ -152,8 +151,6 @@ namespace PleaseThem.States
 
       ResourceManager = new ResourceManager();
 
-      MinionManager = new MinionManager();
-
       float x = Game1.Random.Next(64, (Map.Width * Map.TileSize) - 224); // 224 = HallWidth + 64. 64 = SpaceAroundEdges
       float y = Game1.Random.Next(64, (Map.Height * Map.TileSize) - 288);
 
@@ -204,6 +201,16 @@ namespace PleaseThem.States
       MaximumMinions = 10;
     }
 
+    public void LoadGame()
+    {
+      using (var reader = new StreamReader("data.txt"))
+      {
+        var line = reader.ReadLine();
+
+
+      }
+    }
+
     private void PlaceBuilding()
     {
       if (_buildingList.SelectedBuilding != null)
@@ -241,6 +248,18 @@ namespace PleaseThem.States
             foreach (var resource in Map.ResourceTiles)
             {
               if (resource.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+              {
+                canBuild = false;
+                break;
+              }
+            }
+
+            foreach (var tile in Map.BackgroundTiles)
+            {
+              if (tile.IsVisible)
+                continue;
+
+              if (tile.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
               {
                 canBuild = false;
                 break;
@@ -290,6 +309,51 @@ namespace PleaseThem.States
           i--;
         }
       }
+
+      var validComponents = Components
+        .Where(c => !(c.Equals(_buildingList.SelectedBuilding)))
+        .Where(c => c is Sprite);
+
+      var distance = 448;
+
+      // Sigh - this is where 'Origin' would be useful!
+
+      foreach (var tile in Map.BackgroundTiles)
+      {
+        tile.IsVisible = false;
+
+        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
+          tile.IsVisible = true;
+      }
+
+      foreach (var tile in Map.ResourceTiles)
+      {
+        tile.IsVisible = false;
+
+        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
+          tile.IsVisible = true;
+      }
+    }
+
+    public void SaveGame()
+    {
+      using (var writer = new StreamWriter("data.txt"))
+      {
+        foreach (var component in Components)
+        {
+          var data = component.GetSaveData();
+
+          if (string.IsNullOrEmpty(data))
+            continue;
+
+          var values = data.Split('\n');
+
+          foreach (var value in values)
+          {
+            writer.WriteLine(value);
+          }
+        }
+      }
     }
 
     private void SetInput()
@@ -303,6 +367,16 @@ namespace PleaseThem.States
 
     public override void Update(GameTime gameTime)
     {
+      if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
+      {
+        SaveGame();
+      }
+
+      if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
+      {
+        LoadGame();
+      }
+
       SetInput();
 
       if (_currentKeyboard.IsKeyUp(Keys.Space) && _previousKeyboard.IsKeyDown(Keys.Space))

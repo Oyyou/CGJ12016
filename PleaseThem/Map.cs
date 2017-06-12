@@ -15,7 +15,7 @@ namespace PleaseThem
   {
     #region Fields
     
-    private List<Tile> _backgroundTiles = new List<Tile>();
+    public List<Tile> BackgroundTiles { get; private set; }
 
     private int[,] _resourceMap;
     
@@ -186,11 +186,20 @@ namespace PleaseThem
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      foreach (var tile in _backgroundTiles)
+      foreach (var tile in BackgroundTiles)
         tile.Draw(spriteBatch);
 
       foreach (var tile in ResourceTiles)
         tile.Draw(spriteBatch);
+    }
+
+    public override string GetSaveData()
+    {
+      var data = "--Map--";
+
+
+
+      return data;
     }
 
     /// <summary>
@@ -211,11 +220,13 @@ namespace PleaseThem
 
       Texture2D backgroundTexture = Content.Load<Texture2D>("Tiles/Grass");
 
+      BackgroundTiles = new List<Tile>();
+
       for (int y = 0; y < width; y++)
       {
         for (int x = 0; x < height; x++)
         {
-          _backgroundTiles.Add(new Tile(backgroundTexture, new Vector2(x * TileSize, y * TileSize), TileType.Grass));
+          BackgroundTiles.Add(new Tile(backgroundTexture, new Vector2(x * TileSize, y * TileSize), TileType.Grass));
         }
       }
 

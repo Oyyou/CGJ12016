@@ -90,6 +90,8 @@ namespace PleaseThem.Buildings
       minion.Workplace = this;
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
+      
+      minion.Work += Work;
 
       Minions.Add(minion);
     }
@@ -108,6 +110,8 @@ namespace PleaseThem.Buildings
 
       minion.Colour = Color.White;
       minion.Workplace = null;
+      
+      minion.Work -= Work;
 
       Minions.Remove(minion);
     }
@@ -156,11 +160,20 @@ namespace PleaseThem.Buildings
           if (CurrentMinions > 0)
           {
             Unemploy();
+
             if (this is Farm)
-              ((Farm)this).FarmPositions.Where(c => c.Working).Last().Working = false;
+              ((Farm)this).FarmPositions.Where(c => c.HasWorker).Last().HasWorker = false;
+
+            if (this is SwordSchool)
+              ((SwordSchool)this).BuildingPositions.Where(c => c.HasWorker).Last().HasWorker = false;
           }
         }
       }
+    }
+    
+    private virtual void Work(object sender, EventArgs e)
+    {
+      throw new NotImplementedException("Need to implement 'Work' for building.");
     }
 
     #endregion

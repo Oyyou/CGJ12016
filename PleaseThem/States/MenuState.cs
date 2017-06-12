@@ -87,12 +87,12 @@ namespace PleaseThem.States
     public override void Update(GameTime gameTime)
     {
       foreach (var button in _buttons)
-        button.Update();
+        button.Update();      
     }
 
     private void QuitClick(object sender, EventArgs e)
     {
-      throw new NotImplementedException();
+      _game.Exit();
     }
 
     #endregion

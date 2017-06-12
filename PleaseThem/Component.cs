@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PleaseThem
 {
-  public abstract class Component : ICloneable
+  public abstract class Component : ICloneable, ISaveable
   {
     public bool IsRemoved { get; set; }
 
@@ -20,5 +20,7 @@ namespace PleaseThem
     {
       return this.MemberwiseClone();
     }
+
+    public abstract string GetSaveData();
   }
 }

@@ -14,31 +14,72 @@ namespace PleaseThem.Tiles
     Tree,
     Stone,
     Farm,
+    Militia,
     Occupied,
   }
 
   public class Tile
   {
+    #region Fields
+      
+    private bool _beenSeen = false;
+
     protected Texture2D Texture;
+    
+    #endregion
+      
+    #region Properties
+
+    public bool IsVisible = false;
+
+    protected float Layer = 0.0f;
+    
     public Vector2 Position { get; protected set; }
+    
     public Rectangle Rectangle
     {
       get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
     }
 
-    protected float Layer = 0.0f;
     public TileType TileType { get; protected set; }
+    
+    #endregion
+    
+    #region Methods
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+      var opcity = 0f;
+
+      if (!IsVisible)
+      {
+        if (!_beenSeen)
+        {
+          return;
+        }
+        else
+        {
+          opcity = 0.5f;
+        }
+      }
+      else
+      {
+        opcity = 1f;
+        _beenSeen = true;
+      }
+
+      spriteBatch.Draw(Texture, Position, null, Color.White * opcity, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
+    }
 
     public Tile(Texture2D texture, Vector2 position, TileType tileType)
     {
       Texture = texture;
+      
       Position = position;
+      
       TileType = tileType;
     }
-
-    public void Draw(SpriteBatch spriteBatch)
-    {
-      spriteBatch.Draw(Texture, Position, null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
-    }
+    
+    #endregion
   }
 }

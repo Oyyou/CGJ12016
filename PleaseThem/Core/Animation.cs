@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PleaseThem.Core
 {
-  public class Animation
+  public class Animation : ISaveable
   {
     private Texture2D _texture;
     private int _frameCount;
@@ -57,6 +57,11 @@ namespace PleaseThem.Core
       _frameCount = frameCount;
       _frameTime = frameTime;
       _isLooping = isLooping;
+    }
+
+    public string GetSaveData()
+    {
+      return $"{this.Texture.Name}|{this.FrameCount}|{this.FrameTime}|{this.IsLooping}";
     }
   }
 }

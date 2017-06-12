@@ -18,9 +18,9 @@ namespace PleaseThem
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
-    public State NextState { get; private set; }
-
     public static MessageBox MessageBox;
+
+    public State NextState { get; private set; }
 
     public static Random Random;
 
@@ -150,7 +150,7 @@ namespace PleaseThem
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Draw(GameTime gameTime)
     {
-      GraphicsDevice.Clear(Color.CornflowerBlue);
+      GraphicsDevice.Clear(State.BackgroundColour);
 
       State.Draw(gameTime, spriteBatch);
 

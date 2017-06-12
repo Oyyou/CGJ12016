@@ -23,8 +23,6 @@ namespace PleaseThem.Actors
 
     private Vector2 _currentTarget;
 
-    private Vector2? _idlePosition = null;
-
     private bool _farmingDown;
 
     private Vector2 _farmPos1;
@@ -49,11 +47,35 @@ namespace PleaseThem.Actors
 
     public Vector2 Target { get; private set; }
 
+    public event EventHandler Work { get; set; }
+
     public Building Workplace { get; set; }
+    
+    public Vector2 Velocity
+    {
+      get { return _velocity; }
+      set { _velocity = value; }
+    }
 
     #endregion
 
     #region Methods
+
+    private void CombatTraining(GameTime gameTime)
+    {
+      var swordSchool = Workplace as SwordSchool;
+
+      if (Target == Vector2.Zero)
+      {
+        var position = swordSchool.BuildingPositions.Where(c => !c.HasWorker).FirstOrDefault();
+        position.HasWorker = true;
+
+        Target = position.Positions[0];
+      }
+
+      if (Target != Position)
+        Move(Target);
+    }
 
     private void Farming(GameTime gameTime)
     {
@@ -61,8 +83,8 @@ namespace PleaseThem.Actors
 
       if (_farmPos1 == Vector2.Zero)
       {
-        var farmPosition = farm.FarmPositions.Where(c => !c.Working).FirstOrDefault();
-        farmPosition.Working = true;
+        var farmPosition = farm.FarmPositions.Where(c => !c.HasWorker).FirstOrDefault();
+        farmPosition.HasWorker = true;
 
         _farmPos1 = farmPosition.Positions[0];
         _farmPos2 = farmPosition.Positions[1];
@@ -71,6 +93,7 @@ namespace PleaseThem.Actors
       if (!_atFarm)
       {
         Move(_farmPos1);
+
         if (Position == _farmPos1)
           _atFarm = true;
 
@@ -122,7 +145,7 @@ namespace PleaseThem.Actors
       Layer = 0.8f;
     }
 
-    private void Move(Vector2 target)
+    public void Move(Vector2 target)
     {
       float speed = 2f;
 
@@ -238,9 +261,6 @@ namespace PleaseThem.Actors
 
     public override void Update(GameTime gameTime)
     {
-      if (_idlePosition == null)
-        _idlePosition = Position;
-
       Reset();
 
       Work(gameTime);
@@ -262,7 +282,18 @@ namespace PleaseThem.Actors
 
       if (Workplace.TileType == Tiles.TileType.Farm)
       {
+        Work(this, new EventArgs());
+        
+        return;
+      
         Farming(gameTime);
+
+        return;
+      }
+
+      if (Workplace.TileType == TileType.Militia)
+      {
+        CombatTraining(gameTime);
 
         return;
       }
