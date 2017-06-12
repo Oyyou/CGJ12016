@@ -282,6 +282,10 @@ namespace PleaseThem.Actors
 
       if (Workplace.TileType == Tiles.TileType.Farm)
       {
+        Work(this, new EventArgs());
+        
+        return;
+      
         Farming(gameTime);
 
         return;
