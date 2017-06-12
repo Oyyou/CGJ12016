@@ -27,18 +27,6 @@ namespace PleaseThem.Buildings
       $"Total Minions: {_parent.MinionCount}"
     };
 
-    public override string GetComponentData()
-    {
-      var data = "--Hall--";
-      data += "\n--Resources--";
-      data += "\nFood=" + Resources.Food;
-      data += "\nWood=" + Resources.Wood;
-      data += "\nStone=" + Resources.Stone;
-      data += "\nGold=" + Resources.Gold;
-
-      return data;
-    }
-
     public Hall(GameState parent, Texture2D texture)
       : base(parent, texture)
     {

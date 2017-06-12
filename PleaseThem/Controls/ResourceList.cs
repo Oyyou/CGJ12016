@@ -25,11 +25,6 @@ namespace PleaseThem.Controls
       spriteBatch.DrawString(_font, $"Food: {_parent.ResourceManager.Food} | Wood: {_parent.ResourceManager.Wood} | Stone: {_parent.ResourceManager.Stone} | Gold: {_parent.ResourceManager.Gold}", new Vector2(5, 3), Color.Red);
     }
 
-    public override string GetComponentData()
-    {
-      return "--ResourceList--";
-    }
-
     public ResourceList(GraphicsDevice graphicsDevice, SpriteFont font, GameState parent)
     {
       _texture = new Texture2D(graphicsDevice, 1, 1);

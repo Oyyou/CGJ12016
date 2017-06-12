@@ -42,7 +42,7 @@ namespace PleaseThem.States
 
     private void LoadGameClick(object sender, EventArgs e)
     {
-      Game1.MessageBox.Show("Not even close to implementing this!");
+      throw new NotImplementedException();
     }
 
     public MenuState(Game1 game, GraphicsDevice graphicsDevice, ContentManager Content)
@@ -84,11 +84,6 @@ namespace PleaseThem.States
 
     }
 
-    public override void UnloadContent()
-    {
-      
-    }
-
     public override void Update(GameTime gameTime)
     {
       foreach (var button in _buttons)
@@ -97,7 +92,7 @@ namespace PleaseThem.States
 
     private void QuitClick(object sender, EventArgs e)
     {
-      _game.Exit();
+      throw new NotImplementedException();
     }
 
     #endregion

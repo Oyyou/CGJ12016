@@ -14,27 +14,27 @@ namespace PleaseThem
   public class Map : Component
   {
     #region Fields
-
+    
     private List<Tile> _backgroundTiles = new List<Tile>();
 
     private int[,] _resourceMap;
-
+    
     #endregion
-
+    
     #region Properties
-
+    
     public int Height { get; private set; }
-
+    
     public List<Models.Resource> Resources { get; private set; }
-
+    
     public List<ResourceTile> ResourceTiles { get; private set; }
-
+    
     public const int TileSize = 32;
-
+    
     public int Width { get; private set; }
-
+    
     #endregion
-
+    
     #region Methods
 
     public void Add(Rectangle rectangle)
@@ -64,7 +64,7 @@ namespace PleaseThem
       //  }
       //}
     }
-
+    
     public void CleanArea(Vector2 position, int radius)
     {
       var actualPosition = position / Map.TileSize;
@@ -193,23 +193,6 @@ namespace PleaseThem
         tile.Draw(spriteBatch);
     }
 
-    public override string GetComponentData()
-    {
-      var data = "--Map--";
-
-      for (int y = 0; y < Width; y++)
-      {
-        for (int x = 0; x < Height; x++)
-        {
-          data += _resourceMap[y, x];
-        }
-
-        data += "\n";
-      }
-
-      return data;
-    }
-
     /// <summary>
     /// Returns the tile index for the given cell.
     /// </summary>
@@ -220,7 +203,7 @@ namespace PleaseThem
 
       return (TileType)_resourceMap[cellY, cellX];
     }
-
+    
     public Map(ContentManager Content, int width, int height)
     {
       Width = width;
@@ -240,7 +223,7 @@ namespace PleaseThem
       ResourceTiles = new List<ResourceTile>();
 
       CreateForests();
-
+      
       CreateOres();
 
       var woodTexture = Content.Load<Texture2D>("Tiles/Wood");
@@ -268,12 +251,12 @@ namespace PleaseThem
     {
       _resourceMap[(int)(position.Y / Map.TileSize), (int)(position.X / Map.TileSize)] = (int)TileType.Grass;
     }
-
+    
     public override void Update(GameTime gameTime)
     {
-
+    
     }
-
+    
     #endregion
   }
 }

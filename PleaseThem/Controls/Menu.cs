@@ -65,10 +65,5 @@ namespace PleaseThem.Controls
         fontPosition.Y += y + 5;
       }
     }
-
-    public override string GetComponentData()
-    {
-      return "--Menu--";
-    }
   }
 }
