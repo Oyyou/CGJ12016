@@ -47,6 +47,8 @@ namespace PleaseThem.Actors
 
     public Vector2 Target { get; private set; }
 
+    public event EventHandler Work { get; set; }
+
     public Building Workplace { get; set; }
 
     #endregion
