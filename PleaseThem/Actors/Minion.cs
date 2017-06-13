@@ -61,22 +61,6 @@ namespace PleaseThem.Actors
 
     #region Methods
 
-    private void CombatTraining(GameTime gameTime)
-    {
-      var swordSchool = Workplace as SwordSchool;
-
-      if (Target == Vector2.Zero)
-      {
-        var position = swordSchool.BuildingPositions.Where(c => !c.HasWorker).FirstOrDefault();
-        position.HasWorker = true;
-
-        Target = position.Positions[0];
-      }
-
-      if (Target != Position)
-        Move(Target);
-    }
-
     public Minion(GameState parent, AnimationController animationController)
       : base(parent, animationController)
     {
@@ -222,17 +206,11 @@ namespace PleaseThem.Actors
         return;
       }
 
-      if (Workplace.TileType == Tiles.TileType.Farm)
+      if (Workplace.TileType == Tiles.TileType.Farm ||
+          Workplace.TileType == TileType.Militia)
       {
         WorkEvent(this, new EventArgs());
         
-        return;
-      }
-
-      if (Workplace.TileType == TileType.Militia)
-      {
-        CombatTraining(gameTime);
-
         return;
       }
 

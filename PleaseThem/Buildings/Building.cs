@@ -14,9 +14,50 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Buildings
 {
+  public class PatrolPoints
+  {
+    public bool HasWorker { get; set; }
+
+    public Minion Minion { get; set; }
+
+    public List<Vector2> Positions { get; set; }
+
+    public class KILLMENOW
+    {
+      public bool IsActive { get; set; }
+
+      public Vector2 Value { get; set; }
+    }
+
+    public List<KILLMENOW> PositionsV2 { get; set; }
+
+    public void MoveMinion(Minion minion)
+    {
+      for (int i = 0; i < PositionsV2.Count; i++)
+      {
+        var currentPosition = PositionsV2[i];
+
+        if (currentPosition.IsActive)
+        {
+          minion.Move(currentPosition.Value);
+        }
+
+        if (minion.Position == currentPosition.Value)
+        {
+          var index = i == PositionsV2.Count - 1 ? 0 : i + 1;
+
+          currentPosition.IsActive = false;
+          PositionsV2[index].IsActive = true;
+        }
+      }
+    }
+  }
+
   public class Building : Models.Sprite
   {
     #region Fields
+
+    protected List<PatrolPoints> _buildingPositions { get; set; }
 
     #endregion
 
@@ -78,6 +119,8 @@ namespace PleaseThem.Buildings
       DefaultLayer = 0.7f;
 
       Layer = DefaultLayer;
+
+      _buildingPositions = new List<PatrolPoints>();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -90,7 +133,7 @@ namespace PleaseThem.Buildings
       minion.Workplace = this;
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
-      
+
       minion.WorkEvent += Work;
 
       Minions.Add(minion);
@@ -110,8 +153,13 @@ namespace PleaseThem.Buildings
 
       minion.Colour = Color.White;
       minion.Workplace = null;
-      
+
       minion.WorkEvent -= Work;
+
+      var buildingPosition = _buildingPositions.Where(c => c.Minion == minion).FirstOrDefault();
+
+      if (buildingPosition != null)
+        buildingPosition.Minion = null;
 
       Minions.Remove(minion);
     }
@@ -160,17 +208,11 @@ namespace PleaseThem.Buildings
           if (CurrentMinions > 0)
           {
             Unemploy();
-
-            if (this is Farm)
-              ((Farm)this).FarmPositions.Where(c => c.Minion != null).Last().HasWorker = false;
-
-            if (this is SwordSchool)
-              ((SwordSchool)this).BuildingPositions.Where(c => c.HasWorker).Last().HasWorker = false;
           }
         }
       }
     }
-    
+
     public virtual void Work(object sender, EventArgs e)
     {
       throw new NotImplementedException("Need to implement 'Work' for building.");
