@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PleaseThem.Actors;
 using PleaseThem.Controls;
 using PleaseThem.States;
 using System;
@@ -99,7 +100,7 @@ namespace PleaseThem.Buildings
       
       BuildingPosition farmPosition = null;
       
-      if (!FarmPosition.All(c => c.Minion.Equal(minion))
+      if (!FarmPositions.All(c => c.Minion != null && c.Minion.Equals(minion)))
       {
         farmPosition = FarmPositions.Where(c => c.Minion == null).FirstOrDefault();
         farmPosition.Minion = minion;
@@ -112,12 +113,16 @@ namespace PleaseThem.Buildings
       var farmPosition1 = farmPosition.Positions[0];
       var farmPosition2 = farmPosition.Positions[1];
       
-      if(minion.Velocity == Vector2.Zero)
+      if(minion.Velocity == Vector2.Zero &&
+         minion.Position != farmPosition1 &&
+         minion.Position != farmPosition2)
       {
         minion.Move(farmPosition1);
         
         return;
       }
+
+      var speed = 2f;
       
       if(minion.Position == farmPosition1)
       {
@@ -143,7 +148,7 @@ namespace PleaseThem.Buildings
       //  _resources.Food++;
 
       //  _parent.ResourceManager.Add(_resources);
-      }
+      //}
     }
   }
 }

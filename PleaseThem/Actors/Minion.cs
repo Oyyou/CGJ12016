@@ -47,7 +47,7 @@ namespace PleaseThem.Actors
 
     public Vector2 Target { get; private set; }
 
-    public event EventHandler Work { get; set; }
+    public event EventHandler Workk;
 
     public Building Workplace { get; set; }
     
@@ -282,7 +282,7 @@ namespace PleaseThem.Actors
 
       if (Workplace.TileType == Tiles.TileType.Farm)
       {
-        Work(this, new EventArgs());
+        Workk(this, new EventArgs());
         
         return;
       

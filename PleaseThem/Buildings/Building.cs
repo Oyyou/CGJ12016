@@ -91,7 +91,7 @@ namespace PleaseThem.Buildings
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
       
-      minion.Work += Work;
+      minion.Workk += Work;
 
       Minions.Add(minion);
     }
@@ -111,7 +111,7 @@ namespace PleaseThem.Buildings
       minion.Colour = Color.White;
       minion.Workplace = null;
       
-      minion.Work -= Work;
+      minion.Workk -= Work;
 
       Minions.Remove(minion);
     }
@@ -171,7 +171,7 @@ namespace PleaseThem.Buildings
       }
     }
     
-    private virtual void Work(object sender, EventArgs e)
+    public virtual void Work(object sender, EventArgs e)
     {
       throw new NotImplementedException("Need to implement 'Work' for building.");
     }
