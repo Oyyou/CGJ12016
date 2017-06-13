@@ -47,7 +47,7 @@ namespace PleaseThem.Actors
 
     public Vector2 Target { get; private set; }
 
-    public event EventHandler Workk;
+    public event EventHandler WorkEvent;
 
     public Building Workplace { get; set; }
     
@@ -75,64 +75,6 @@ namespace PleaseThem.Actors
 
       if (Target != Position)
         Move(Target);
-    }
-
-    private void Farming(GameTime gameTime)
-    {
-      var farm = Workplace as Farm;
-
-      if (_farmPos1 == Vector2.Zero)
-      {
-        var farmPosition = farm.FarmPositions.Where(c => !c.HasWorker).FirstOrDefault();
-        farmPosition.HasWorker = true;
-
-        _farmPos1 = farmPosition.Positions[0];
-        _farmPos2 = farmPosition.Positions[1];
-      }
-
-      if (!_atFarm)
-      {
-        Move(_farmPos1);
-
-        if (Position == _farmPos1)
-          _atFarm = true;
-
-        return;
-      }
-
-      if (Position == _farmPos1 ||
-          Position == _farmPos2)
-        _farmingDown = !_farmingDown;
-
-      var node = _farmPos1;
-
-      if (!_farmingDown)
-        node = _farmPos2;
-
-      float speed = 2;
-
-      if (node != null)
-      {
-        if (Position.Y > node.Y)
-          _velocity = new Vector2(0, -speed);
-        else if (Position.Y < node.Y)
-          _velocity = new Vector2(0, speed);
-        else if (Position.X > node.X)
-          _velocity = new Vector2(-speed, 0);
-        else if (Position.X < node.X)
-          _velocity = new Vector2(speed, 0);
-      }
-
-      _resourceCollectionTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-      if (_resourceCollectionTimer > 2.5f)
-      {
-        _resourceCollectionTimer = 0.0f;
-
-        _resources.Food++;
-
-        _parent.ResourceManager.Add(_resources);
-      }
     }
 
     public Minion(GameState parent, AnimationController animationController)
@@ -282,12 +224,8 @@ namespace PleaseThem.Actors
 
       if (Workplace.TileType == Tiles.TileType.Farm)
       {
-        Workk(this, new EventArgs());
+        WorkEvent(this, new EventArgs());
         
-        return;
-      
-        Farming(gameTime);
-
         return;
       }
 

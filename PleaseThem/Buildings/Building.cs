@@ -91,7 +91,7 @@ namespace PleaseThem.Buildings
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
       
-      minion.Workk += Work;
+      minion.WorkEvent += Work;
 
       Minions.Add(minion);
     }
@@ -111,7 +111,7 @@ namespace PleaseThem.Buildings
       minion.Colour = Color.White;
       minion.Workplace = null;
       
-      minion.Workk -= Work;
+      minion.WorkEvent -= Work;
 
       Minions.Remove(minion);
     }
@@ -162,7 +162,7 @@ namespace PleaseThem.Buildings
             Unemploy();
 
             if (this is Farm)
-              ((Farm)this).FarmPositions.Where(c => c.HasWorker).Last().HasWorker = false;
+              ((Farm)this).FarmPositions.Where(c => c.Minion != null).Last().HasWorker = false;
 
             if (this is SwordSchool)
               ((SwordSchool)this).BuildingPositions.Where(c => c.HasWorker).Last().HasWorker = false;

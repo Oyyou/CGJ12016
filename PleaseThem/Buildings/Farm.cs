@@ -16,10 +16,19 @@ namespace PleaseThem.Buildings
   public class BuildingPosition
   {
     public bool HasWorker { get; set; }
-    
+
     public Minion Minion { get; set; }
-    
+
     public List<Vector2> Positions { get; set; }
+
+    public class KILLMENOW
+    {
+      public bool IsActive { get; set; }
+
+      public Vector2 Value { get; set; }
+    }
+
+    public List<KILLMENOW> PositionsV2 { get; set; }
   }
 
   public class Farm : Building
@@ -66,6 +75,19 @@ namespace PleaseThem.Buildings
           new Vector2(Position.X + 32, Rectangle.Top + 96),
           new Vector2(Position.X + 32, Rectangle.Bottom - 32)
         },
+        PositionsV2 = new List<BuildingPosition.KILLMENOW>()
+        {
+          new Buildings.BuildingPosition.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 32, Rectangle.Top + 96),
+            IsActive= true,
+          },
+          new Buildings.BuildingPosition.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 32, Rectangle.Bottom - 32),
+            IsActive= false,
+          }
+        }
       });
 
       FarmPositions.Add(new BuildingPosition()
@@ -76,6 +98,19 @@ namespace PleaseThem.Buildings
           new Vector2(Position.X + 96, Rectangle.Top),
           new Vector2(Position.X + 96, Rectangle.Bottom - 32)
         },
+        PositionsV2 = new List<BuildingPosition.KILLMENOW>()
+        {
+          new Buildings.BuildingPosition.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 96, Rectangle.Top),
+            IsActive= true,
+          },
+          new Buildings.BuildingPosition.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 96, Rectangle.Bottom - 32),
+            IsActive= false,
+          }
+        }
       });
 
       FarmPositions.Add(new BuildingPosition()
@@ -86,6 +121,19 @@ namespace PleaseThem.Buildings
           new Vector2(Position.X + 160, Rectangle.Top),
           new Vector2(Position.X + 160, Rectangle.Bottom - 32)
         },
+        PositionsV2 = new List<BuildingPosition.KILLMENOW>()
+        {
+          new Buildings.BuildingPosition.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 160, Rectangle.Top),
+            IsActive= true,
+          },
+          new Buildings.BuildingPosition.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 160, Rectangle.Bottom - 32),
+            IsActive= false,
+          }
+        }
       });
     }
 
@@ -93,50 +141,35 @@ namespace PleaseThem.Buildings
     {
       base.Update(gameTime);
     }
-    
+
     public override void Work(object sender, EventArgs e)
     {
-      var minion = sender as Minion;      
-      
-      BuildingPosition farmPosition = null;
-      
-      if (!FarmPositions.All(c => c.Minion != null && c.Minion.Equals(minion)))
+      var minion = sender as Minion;
+
+      var farmPosition = FarmPositions.Where(c => c.Minion == minion).FirstOrDefault();
+
+      if (farmPosition == null && !FarmPositions.All(c => c.Minion != null && c.Minion.Equals(minion)))
       {
         farmPosition = FarmPositions.Where(c => c.Minion == null).FirstOrDefault();
         farmPosition.Minion = minion;
       }
-      else
-      {
-        farmPosition = FarmPositions.Where(c => c.Minion == minion).FirstOrDefault();
-      }
-      
-      var farmPosition1 = farmPosition.Positions[0];
-      var farmPosition2 = farmPosition.Positions[1];
-      
-      if(minion.Velocity == Vector2.Zero &&
-         minion.Position != farmPosition1 &&
-         minion.Position != farmPosition2)
-      {
-        minion.Move(farmPosition1);
-        
-        return;
-      }
 
-      var speed = 2f;
-      
-      if(minion.Position == farmPosition1)
+      for (int i = 0; i < farmPosition.PositionsV2.Count; i++)
       {
-        if(farmPosition2.Y > farmPosition1.Y)
-          minion.Velocity = new Vector2(0, speed);
-        else
-          minion.Velocity = new Vector2(0, -speed);
-      }
-      else if(minion.Position == farmPosition1)
-      {
-        if(farmPosition1.Y > farmPosition2.Y)
-          minion.Velocity = new Vector2(0, speed);
-        else
-          minion.Velocity = new Vector2(0, -speed);
+        var currentPosition = farmPosition.PositionsV2[i];
+
+        if (currentPosition.IsActive)
+        {
+          minion.Move(currentPosition.Value);
+        }
+
+        if (minion.Position == currentPosition.Value)
+        {
+          var index = i == farmPosition.PositionsV2.Count - 1 ? 0 : i + 1;
+
+          currentPosition.IsActive = false;
+          farmPosition.PositionsV2[index].IsActive = true;
+        }
       }
 
       //_resourceCollectionTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
