@@ -54,13 +54,9 @@ namespace PleaseThem.Tiles
       if (!IsVisible)
       {
         if (!_beenSeen)
-        {
           return;
-        }
         else
-        {
           opcity = 0.5f;
-        }
       }
       else
       {
