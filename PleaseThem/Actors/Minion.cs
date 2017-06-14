@@ -19,15 +19,7 @@ namespace PleaseThem.Actors
   {
     #region Fields
 
-    private bool _atFarm;
-
     private Vector2 _currentTarget;
-
-    private bool _farmingDown;
-
-    private Vector2 _farmPos1;
-
-    private Vector2 _farmPos2;
 
     private float _resourceCollectionTimer = 0f;
 
@@ -120,9 +112,6 @@ namespace PleaseThem.Actors
         return;
 
       _animationPlayer.Colour = Color.White;
-      _farmPos1 = Vector2.Zero;
-      _farmPos2 = Vector2.Zero;
-      _atFarm = false;
     }
 
     /// <summary>
@@ -202,11 +191,11 @@ namespace PleaseThem.Actors
     {
       if (Workplace == null)
       {
-        _resourceTile = null; // When the minion isn't working, it's targetted resource is set to null
+        _resourceTile = null; // When the minion isn't working, it's targeted resource is set to null
         return;
       }
 
-      if (Workplace.TileType == Tiles.TileType.Farm ||
+      if (Workplace.TileType == TileType.Farm ||
           Workplace.TileType == TileType.Militia)
       {
         WorkEvent(this, new EventArgs());
