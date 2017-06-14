@@ -53,6 +53,20 @@ namespace PleaseThem.Buildings
     }
   }
 
+  public class TargetPoints
+  {
+    /// <summary>
+    /// The building that found the point
+    /// </summary>
+    public Building Building { get; set; }
+
+    public bool InUse { get; set; }
+
+    public Vector2 Position { get; set; }
+
+    public TileType TileType { get; set; }
+  }
+
   public class Building : Models.Sprite
   {
     #region Fields
@@ -105,6 +119,11 @@ namespace PleaseThem.Buildings
 
     public bool RightClicked { get; private set; }
 
+    /// <summary>
+    /// A list of points our minions can travel to for resources
+    /// </summary>
+    public static List<TargetPoints> TargetPoints = new List<Buildings.TargetPoints>();
+
     public TileType TileType { get; protected set; }
 
     #endregion
@@ -142,6 +161,56 @@ namespace PleaseThem.Buildings
     public virtual void Initialise()
     {
 
+    }
+
+    public void SetTargetPoints()
+    {
+      var targetPoints = new List<TargetPoints>();
+
+      var maxTargetCount = 4;
+
+      int attempts = 0;
+
+      while (targetPoints.Count < maxTargetCount && attempts < 100)
+      {
+        var resourceTile = _parent.Map.ResourceTiles
+            .Where(c => c.TileType == TileType)
+            .OrderBy(c => Vector2.Distance(DoorPosition, c.Position)).ToArray()[attempts];
+
+        var positions = new List<Vector2>()
+        {
+          resourceTile.Position - new Vector2(32, 0),
+          resourceTile.Position + new Vector2(32, 0),
+          resourceTile.Position - new Vector2(0, 32),
+          resourceTile.Position + new Vector2(0, 32),
+        };
+
+        foreach (var position in positions)
+        {
+          if (targetPoints.Count == maxTargetCount)
+            break;
+
+          if (TargetPoints.Any(c => c.Position == position))
+            continue;
+
+          var path = _parent.Pathfinder.FindPath(DoorPosition, position);
+
+          if (path.Count > 0)
+          {
+            targetPoints.Add(
+              new TargetPoints()
+              {
+                Building = this,
+                InUse = false,
+                Position = position,
+                TileType = this.TileType,
+              });
+          }
+        }
+        attempts++;
+      }
+
+      TargetPoints.AddRange(targetPoints);
     }
 
     public void Unemploy()

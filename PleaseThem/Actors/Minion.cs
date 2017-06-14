@@ -27,6 +27,9 @@ namespace PleaseThem.Actors
 
     private Models.Resources _resources = null;
 
+    /// <summary>
+    /// The tile we're gathering resources from
+    /// </summary>
     private ResourceTile _resourceTile = null;
 
     private Vector2 _velocity;

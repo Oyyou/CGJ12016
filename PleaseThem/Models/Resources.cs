@@ -13,6 +13,9 @@ namespace PleaseThem.Models
     public int Stone { get; set; }
     public int Gold { get; set; }
 
+    /// <summary>
+    /// Get the sum of all resources
+    /// </summary>
     public int GetTotal()
     {
       return Food +

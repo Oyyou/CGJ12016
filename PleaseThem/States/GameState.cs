@@ -277,6 +277,10 @@ namespace PleaseThem.States
               newBuilding.Color = Color.White;
               newBuilding.Layer = _buildingList.SelectedBuilding.DefaultLayer;
 
+              if (newBuilding.TileType == Tiles.TileType.Stone ||
+                  newBuilding.TileType == Tiles.TileType.Tree)
+                newBuilding.SetTargetPoints();
+
               Components.Add(newBuilding);
 
               _buildingList.SelectedBuilding.Initialise();
