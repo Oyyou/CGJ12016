@@ -66,6 +66,13 @@ namespace PleaseThem.Buildings
 
     public TileType TileType { get; set; }
   }
+  
+  public enum BuildingStates
+  {
+    Placed,
+    Building,
+    Built,
+  }
 
   public class Building : Models.Sprite
   {
@@ -76,6 +83,8 @@ namespace PleaseThem.Buildings
     #endregion
 
     #region Properties
+    
+    public BuildingStates BuildingState { get; set; }
 
     public bool CanHaveWorkers
     {
@@ -140,6 +149,8 @@ namespace PleaseThem.Buildings
       Layer = DefaultLayer;
 
       _buildingPositions = new List<PatrolPoints>();
+      
+      BuildingState = BuildingStates.Placed;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -157,10 +168,59 @@ namespace PleaseThem.Buildings
 
       Minions.Add(minion);
     }
-
-    public virtual void Initialise()
+    
+    private virtual void Initialise()
     {
 
+    }
+    
+    /// <summary>
+    /// Nothing
+    /// </summary>
+    public void OnBuildingClicked()
+    {
+    
+    }
+    
+    /// <summary>
+    /// Hire/Fire minion
+    /// </summary>
+    private void OnBuiltClicked()
+    {
+      if (LeftClicked)
+      {            
+        if (CanHaveWorkers)
+        {
+          if (_parent.UnemploymentCount > 0)
+          {
+            var minion = _parent.Components.Where(c => c is Minion).Where(c => ((Minion)c).Workplace == null).FirstOrDefault() as Minion;
+            Employ(minion);
+          }
+          else
+          {
+            Game1.MessageBox.Show("There are no unemployed minions");
+          }
+        }
+        else
+        {
+          Game1.MessageBox.Show("Building can't employ");
+        }
+      }
+      if (RightClicked)
+      {
+        if (CurrentMinions > 0)
+        {
+          Unemploy();
+        }
+      }      
+    }
+
+    /// <summary>
+    /// Send minion to 'build' the building
+    /// </summary>    
+    public void OnPlacedClicked()
+    {
+      
     }
 
     public void SetTargetPoints()
@@ -249,35 +309,32 @@ namespace PleaseThem.Buildings
         if (_parent.CurrentMouse.RightButton == ButtonState.Pressed && _parent.PreviousMouse.RightButton == ButtonState.Released)
           RightClicked = true;
       }
-
+      
+      
       if (_parent.MouseRectangle.Y >= 32 && _parent.MouseRectangle.Y < (Game1.ScreenHeight - 64))
       {
-        if (LeftClicked)
+        switch(BuildingState)
         {
-          if (CanHaveWorkers)
-          {
-            if (_parent.UnemploymentCount > 0)
-            {
-              var minion = _parent.Components.Where(c => c is Minion).Where(c => ((Minion)c).Workplace == null).FirstOrDefault() as Minion;
-              Employ(minion);
-            }
-            else
-            {
-              Game1.MessageBox.Show("There are no unemployed minions");
-            }
-          }
-          else
-          {
-            Game1.MessageBox.Show("Building can't employ");
-          }
-        }
+          case BuildingStates.Placed:
 
-        if (RightClicked)
-        {
-          if (CurrentMinions > 0)
-          {
-            Unemploy();
-          }
+            OnPlacedClicked();
+
+            break;
+
+          case BuildingStates.Building:
+
+            OnBuildingClicked();
+
+            break;
+
+          case BuildingStates.Built:
+
+            OnBuiltClicked();
+
+            break;
+
+            default:
+              throw new Exception($"Building state '{BuildingState.ToString()}' doesn't exist");
         }
       }
     }
