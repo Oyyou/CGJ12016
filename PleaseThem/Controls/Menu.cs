@@ -40,11 +40,11 @@ namespace PleaseThem.Controls
       if (building.Content.Count() == 0)
         return;
 
-      _rectangle = new Rectangle(building.Rectangle.X + ((building.Width - _texture.Width) / 2),
-                                 building.Rectangle.Y - 5 - _texture.Height, _texture.Width, _texture.Height);
+      _rectangle = new Rectangle(building.CollisionRectangle.X + ((building.FrameWidth - _texture.Width) / 2),
+                                 building.CollisionRectangle.Y - 5 - _texture.Height, _texture.Width, _texture.Height);
 
       if (_rectangle.Y < 32)
-        _rectangle.Y = (building.Rectangle.Bottom - 32) + 5; // The 32 is the 'whitespace' I have under buildings.
+        _rectangle.Y = (building.CollisionRectangle.Bottom - 32) + 5; // The 32 is the 'whitespace' I have under buildings.
 
       spriteBatch.Draw(_texture, _rectangle, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0.85f);
 

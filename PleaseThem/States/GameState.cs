@@ -51,6 +51,8 @@ namespace PleaseThem.States
 
     public List<Component> GUIComponents { get; private set; }
 
+    public int IdCount { get; private set; }
+
     public Map Map { get; private set; }
 
     public int MaximumMinions { get; private set; }
@@ -106,7 +108,7 @@ namespace PleaseThem.States
           })
         {
           Position = building.DoorPosition,
-          Home = building,
+          Home = building.Id,
           IsVisible = false,
         });
       }
@@ -163,9 +165,11 @@ namespace PleaseThem.States
 
       Components = new List<Component>()
       {
-        new Hall(this, content.Load<Texture2D>("Buildings/Hall"))
+        new Hall(this, content.Load<Texture2D>("Buildings/Hall"), 2)
         {
           Position = hallPosition,
+          BuildingState = BuildingStates.Built,
+          Id = IdCount++,
         },
         _menu,
       };
@@ -225,14 +229,14 @@ namespace PleaseThem.States
             if (component is Building)
             {
               if (component == _buildingList.SelectedBuilding)
-                break;
+                continue;
             }
 
             if (component is Menu)
-              break;
+              continue;
 
             var building = component as Models.Sprite;
-            if (building.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+            if (building.CollisionRectangle.Intersects(_buildingList.SelectedBuilding.CollisionRectangle))
             {
               canBuild = false;
               break;
@@ -247,7 +251,7 @@ namespace PleaseThem.States
           {
             foreach (var resource in Map.ResourceTiles)
             {
-              if (resource.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+              if (resource.Rectangle.Intersects(_buildingList.SelectedBuilding.CollisionRectangle))
               {
                 canBuild = false;
                 break;
@@ -259,7 +263,7 @@ namespace PleaseThem.States
               if (tile.IsVisible)
                 continue;
 
-              if (tile.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+              if (tile.Rectangle.Intersects(_buildingList.SelectedBuilding.CollisionRectangle))
               {
                 canBuild = false;
                 break;
@@ -276,6 +280,8 @@ namespace PleaseThem.States
 
               newBuilding.Color = Color.White;
               newBuilding.Layer = _buildingList.SelectedBuilding.DefaultLayer;
+              newBuilding.BuildingState = BuildingStates.Placed;
+              newBuilding.Id = IdCount++;
 
               if (newBuilding.TileType == Tiles.TileType.Stone ||
                   newBuilding.TileType == Tiles.TileType.Tree)
@@ -371,15 +377,15 @@ namespace PleaseThem.States
 
     public override void Update(GameTime gameTime)
     {
-      if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
-      {
-        SaveGame();
-      }
+      //if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
+      //{
+      //  SaveGame();
+      //}
 
-      if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
-      {
-        LoadGame();
-      }
+      //if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
+      //{
+      //  LoadGame();
+      //}
 
       SetInput();
 

@@ -38,13 +38,13 @@ namespace PleaseThem.Actors
 
     #region Properties
 
-    public Building Home { get; set; }
+    public int? Home { get; set; }
 
     public Vector2 Target { get; private set; }
 
     public event EventHandler WorkEvent;
 
-    public Building Workplace { get; set; }
+    public int? Workplace { get; set; }
     
     public Vector2 Velocity
     {
@@ -127,7 +127,9 @@ namespace PleaseThem.Actors
       if (Workplace != null)
         return;
 
-      if (Position == Home.DoorPosition)
+      var home = _parent.Components.Where(c => c.Id == Home.Value).FirstOrDefault() as Building;
+
+      if (Position == home.DoorPosition)
         IsVisible = false;
 
       // If they're already home, leave this method
@@ -135,7 +137,7 @@ namespace PleaseThem.Actors
         return;
 
       // Go to the door position of 'Home'
-      Move(Home.DoorPosition);
+      Move(home.DoorPosition);
     }
 
     private void SetAnimation()
@@ -198,8 +200,10 @@ namespace PleaseThem.Actors
         return;
       }
 
-      if (Workplace.TileType == TileType.Farm ||
-          Workplace.TileType == TileType.Militia)
+      var workplace = _parent.Components.Where(c => c.Id == Workplace.Value).FirstOrDefault() as Building;
+
+      if (workplace.TileType == TileType.Farm ||
+          workplace.TileType == TileType.Militia)
       {
         WorkEvent(this, new EventArgs());
         
@@ -222,8 +226,8 @@ namespace PleaseThem.Actors
         while (Target == Vector2.Zero)
         {
           _resourceTile = _parent.Map.ResourceTiles
-            .Where(c => c.TileType == Workplace.TileType)
-            .OrderBy(c => Vector2.Distance(Workplace.DoorPosition, c.Position)).ToArray()[i]; // Should be the closest
+            .Where(c => c.TileType == workplace.TileType)
+            .OrderBy(c => Vector2.Distance(workplace.DoorPosition, c.Position)).ToArray()[i]; // Should be the closest
 
           var left = _resourceTile.Position - new Vector2(32, 0);
           var right = _resourceTile.Position + new Vector2(32, 0);
@@ -280,7 +284,7 @@ namespace PleaseThem.Actors
           {
             _resourceCollectionTimer = 0.0f;
 
-            switch (Workplace.TileType)
+            switch (workplace.TileType)
             {
               case Tiles.TileType.Tree:
                 _resources.Wood++;
@@ -307,8 +311,8 @@ namespace PleaseThem.Actors
       {
         Target = Vector2.Zero;
 
-        if (Position != Workplace.DoorPosition)
-          Move(Workplace.DoorPosition); // return to resource building
+        if (Position != workplace.DoorPosition)
+          Move(workplace.DoorPosition); // return to resource building
         else
         {
           _parent.ResourceManager.Add(_resources);

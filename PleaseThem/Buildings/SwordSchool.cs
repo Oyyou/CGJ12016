@@ -21,12 +21,12 @@ namespace PleaseThem.Buildings
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y, 160, 96);
+        return new Rectangle((int)Position.X, (int)Position.Y, FrameWidth, 96);
       }
     }
 
-    public SwordSchool(GameState parent, Texture2D texture)
-      : base(parent, texture)
+    public SwordSchool(GameState parent, Texture2D texture, int frameCount)
+      : base(parent, texture, frameCount)
     {
       Resources = new Models.Resources()
       {

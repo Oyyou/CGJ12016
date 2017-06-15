@@ -18,14 +18,14 @@ namespace PleaseThem.Buildings
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height - 32);
+        return new Rectangle((int)Position.X, (int)Position.Y, FrameWidth, _texture.Height - 32);
       }
     }
 
     public override string[] Content => new string[] { $"Minions: {CurrentMinions}/{MaxMinions}" };
 
-    public Mining(GameState parent, Texture2D texture)
-      : base(parent, texture)
+    public Mining(GameState parent, Texture2D texture, int frameCount)
+      : base(parent, texture, frameCount)
     {
       Resources = new Models.Resources()
       {

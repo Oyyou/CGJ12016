@@ -66,7 +66,7 @@ namespace PleaseThem.Buildings
 
     public TileType TileType { get; set; }
   }
-  
+
   public enum BuildingStates
   {
     Placed,
@@ -80,10 +80,38 @@ namespace PleaseThem.Buildings
 
     protected List<PatrolPoints> _buildingPositions { get; set; }
 
+    protected int _currentFrame
+    {
+      get
+      {
+        switch (BuildingState)
+        {
+          case BuildingStates.Placed:
+
+            return 0;
+
+          case BuildingStates.Building:
+
+            throw new NotImplementedException("What do when building!?");
+
+          case BuildingStates.Built:
+
+            return 1;
+
+          default:
+            throw new Exception($"Building state '{BuildingState.ToString()}' doesn't exist");
+        }
+      }
+    }
+
+    protected int _frameCount { get; set; }
+
+    protected virtual Rectangle _viewRectangle { get { return new Rectangle(_currentFrame * FrameWidth, 0, FrameWidth, _texture.Height); } }
+
     #endregion
 
     #region Properties
-    
+
     public BuildingStates BuildingState { get; set; }
 
     public bool CanHaveWorkers
@@ -110,11 +138,13 @@ namespace PleaseThem.Buildings
     {
       get
       {
-        var width = (int)Math.Floor((this.Rectangle.Width / Map.TileSize) / 2m);
+        var width = (int)Math.Floor((this.CollisionRectangle.Width / Map.TileSize) / 2m);
 
         return new Vector2(Position.X + (width * Map.TileSize), Rectangle.Bottom - 32);
       }
     }
+
+    public int FrameWidth { get { return _texture.Width / _frameCount; } }
 
     public bool LeftClicked { get; private set; }
 
@@ -131,7 +161,7 @@ namespace PleaseThem.Buildings
     /// <summary>
     /// A list of points our minions can travel to for resources
     /// </summary>
-    public static List<TargetPoints> TargetPoints = new List<Buildings.TargetPoints>();
+    public List<TargetPoints> TargetPoints = new List<Buildings.TargetPoints>();
 
     public TileType TileType { get; protected set; }
 
@@ -139,9 +169,11 @@ namespace PleaseThem.Buildings
 
     #region Methods
 
-    public Building(GameState parent, Texture2D texture)
+    public Building(GameState parent, Texture2D texture, int frameCount)
       : base(parent, texture)
     {
+      _frameCount = frameCount;
+
       Minions = new List<Actors.Minion>();
 
       DefaultLayer = 0.7f;
@@ -149,18 +181,18 @@ namespace PleaseThem.Buildings
       Layer = DefaultLayer;
 
       _buildingPositions = new List<PatrolPoints>();
-      
+
       BuildingState = BuildingStates.Placed;
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, Position, null, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
+      spriteBatch.Draw(_texture, Position, _viewRectangle, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
     }
 
     public void Employ(Actors.Minion minion)
     {
-      minion.Workplace = this;
+      minion.Workplace = this.Id;
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
 
@@ -168,27 +200,27 @@ namespace PleaseThem.Buildings
 
       Minions.Add(minion);
     }
-    
-    private virtual void Initialise()
+
+    public virtual void Initialise()
     {
 
     }
-    
+
     /// <summary>
     /// Nothing
     /// </summary>
     public void OnBuildingClicked()
     {
-    
+
     }
-    
+
     /// <summary>
     /// Hire/Fire minion
     /// </summary>
     private void OnBuiltClicked()
     {
       if (LeftClicked)
-      {            
+      {
         if (CanHaveWorkers)
         {
           if (_parent.UnemploymentCount > 0)
@@ -212,7 +244,7 @@ namespace PleaseThem.Buildings
         {
           Unemploy();
         }
-      }      
+      }
     }
 
     /// <summary>
@@ -220,7 +252,8 @@ namespace PleaseThem.Buildings
     /// </summary>    
     public void OnPlacedClicked()
     {
-      
+      if (LeftClicked)
+        BuildingState = BuildingStates.Built;
     }
 
     public void SetTargetPoints()
@@ -301,7 +334,7 @@ namespace PleaseThem.Buildings
       LeftClicked = false;
       RightClicked = false;
 
-      if (_parent.MouseRectangleWithCamera.Intersects(Rectangle))
+      if (_parent.MouseRectangleWithCamera.Intersects(CollisionRectangle))
       {
         if (_parent.CurrentMouse.LeftButton == ButtonState.Pressed && _parent.PreviousMouse.LeftButton == ButtonState.Released)
           LeftClicked = true;
@@ -309,11 +342,11 @@ namespace PleaseThem.Buildings
         if (_parent.CurrentMouse.RightButton == ButtonState.Pressed && _parent.PreviousMouse.RightButton == ButtonState.Released)
           RightClicked = true;
       }
-      
-      
+
+
       if (_parent.MouseRectangle.Y >= 32 && _parent.MouseRectangle.Y < (Game1.ScreenHeight - 64))
       {
-        switch(BuildingState)
+        switch (BuildingState)
         {
           case BuildingStates.Placed:
 
@@ -333,8 +366,8 @@ namespace PleaseThem.Buildings
 
             break;
 
-            default:
-              throw new Exception($"Building state '{BuildingState.ToString()}' doesn't exist");
+          default:
+            throw new Exception($"Building state '{BuildingState.ToString()}' doesn't exist");
         }
       }
     }

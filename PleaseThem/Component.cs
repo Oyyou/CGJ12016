@@ -10,6 +10,8 @@ namespace PleaseThem
 {
   public abstract class Component : ICloneable, ISaveable
   {
+    public int Id { get; set; }
+
     public bool IsRemoved { get; set; }
 
     public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);

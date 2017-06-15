@@ -17,7 +17,7 @@ namespace PleaseThem.Buildings
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y + 32, _texture.Width, 96);
+        return new Rectangle((int)Position.X, (int)Position.Y + 32, FrameWidth, 96);
       }
     }
 
@@ -27,8 +27,8 @@ namespace PleaseThem.Buildings
       $"Total Minions: {_parent.MinionCount}"
     };
 
-    public Hall(GameState parent, Texture2D texture)
-      : base(parent, texture)
+    public Hall(GameState parent, Texture2D texture, int frameCount)
+      : base(parent, texture, frameCount)
     {
       Resources = new Models.Resources()
       {

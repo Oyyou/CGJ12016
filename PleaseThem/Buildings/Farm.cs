@@ -25,8 +25,8 @@ namespace PleaseThem.Buildings
       }
     }
 
-    public Farm(GameState parent, Texture2D texture)
-      : base(parent, texture)
+    public Farm(GameState parent, Texture2D texture, int frameCount)
+      : base(parent, texture, frameCount)
     {
       Resources = new Models.Resources()
       {
