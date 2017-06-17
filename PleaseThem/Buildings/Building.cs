@@ -152,7 +152,7 @@ namespace PleaseThem.Buildings
 
     public Color MinionColor { get; protected set; }
 
-    public List<Actors.Minion> Minions { get; private set; }
+    public List<int> Minions { get; private set; }
 
     public Models.Resources Resources { get; protected set; }
 
@@ -174,7 +174,7 @@ namespace PleaseThem.Buildings
     {
       _frameCount = frameCount;
 
-      Minions = new List<Actors.Minion>();
+      Minions = new List<int>();
 
       DefaultLayer = 0.7f;
 
@@ -190,15 +190,15 @@ namespace PleaseThem.Buildings
       spriteBatch.Draw(_texture, Position, _viewRectangle, Color, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
     }
 
-    public void Employ(Actors.Minion minion)
+    public virtual void Employ(Actors.Minion minion)
     {
-      minion.Workplace = this.Id;
+      minion.WorkplaceId = this.Id;
       minion.Colour = this.MinionColor;
       minion.IsVisible = true;
 
       minion.WorkEvent += Work;
 
-      Minions.Add(minion);
+      Minions.Add(minion.Id);
     }
 
     public virtual void Initialise()
@@ -225,7 +225,7 @@ namespace PleaseThem.Buildings
         {
           if (_parent.UnemploymentCount > 0)
           {
-            var minion = _parent.Components.Where(c => c is Minion).Where(c => ((Minion)c).Workplace == null).FirstOrDefault() as Minion;
+            var minion = _parent.Components.Where(c => c is Minion).Where(c => ((Minion)c).WorkplaceId == null).FirstOrDefault() as Minion;
             Employ(minion);
           }
           else
@@ -306,15 +306,17 @@ namespace PleaseThem.Buildings
       TargetPoints.AddRange(targetPoints);
     }
 
-    public void Unemploy()
+    public virtual void Unemploy()
     {
       if (CurrentMinions == 0)
         return;
 
-      var minion = Minions.Last();
+      var minionId = Minions.Last();
+
+      var minion = _parent.Components.Where(c => c.Id == minionId).FirstOrDefault() as Minion;
 
       minion.Colour = Color.White;
-      minion.Workplace = null;
+      minion.WorkplaceId = null;
 
       minion.WorkEvent -= Work;
 
@@ -323,7 +325,7 @@ namespace PleaseThem.Buildings
       if (buildingPosition != null)
         buildingPosition.Minion = null;
 
-      Minions.Remove(minion);
+      Minions.Remove(minionId);
     }
 
     public override void Update(GameTime gameTime)

@@ -21,6 +21,10 @@ namespace PleaseThem.Actors
 
     private Vector2 _currentTarget;
 
+    private Vector2 _currentTile;
+
+    private Vector2 _previousTile;
+
     private float _resourceCollectionTimer = 0f;
 
     private int _resourceMax = 20;
@@ -38,13 +42,13 @@ namespace PleaseThem.Actors
 
     #region Properties
 
-    public int? Home { get; set; }
+    public int? HomeId { get; set; }
 
     public Vector2 Target { get; private set; }
 
     public event EventHandler WorkEvent;
 
-    public int? Workplace { get; set; }
+    public int? WorkplaceId { get; set; }
     
     public Vector2 Velocity
     {
@@ -83,6 +87,14 @@ namespace PleaseThem.Actors
           node = paths.FirstOrDefault() * 32;
 
         _currentTarget = node;
+
+        _previousTile = _currentTile;
+        _currentTile = _currentTarget;
+
+        if (_previousTile != _currentTile)
+        {
+          _parent.UpdateVisibility(this);
+        }
       }
       else node = _currentTarget;
 
@@ -111,7 +123,7 @@ namespace PleaseThem.Actors
     {
       _velocity = new Vector2();
 
-      if (Workplace != null)
+      if (WorkplaceId != null)
         return;
 
       _animationPlayer.Colour = Color.White;
@@ -124,10 +136,10 @@ namespace PleaseThem.Actors
     private void ReturnHome(GameTime gameTime)
     {
       // If the minion is employed, leave this method
-      if (Workplace != null)
+      if (WorkplaceId != null)
         return;
 
-      var home = _parent.Components.Where(c => c.Id == Home.Value).FirstOrDefault() as Building;
+      var home = _parent.Components.Where(c => c.Id == HomeId.Value).FirstOrDefault() as Building;
 
       if (Position == home.DoorPosition)
         IsVisible = false;
@@ -194,13 +206,13 @@ namespace PleaseThem.Actors
 
     private void Work(GameTime gameTime)
     {
-      if (Workplace == null)
+      if (WorkplaceId == null)
       {
         _resourceTile = null; // When the minion isn't working, it's targeted resource is set to null
         return;
       }
 
-      var workplace = _parent.Components.Where(c => c.Id == Workplace.Value).FirstOrDefault() as Building;
+      var workplace = _parent.Components.Where(c => c.Id == WorkplaceId.Value).FirstOrDefault() as Building;
 
       if (workplace.TileType == TileType.Farm ||
           workplace.TileType == TileType.Militia)

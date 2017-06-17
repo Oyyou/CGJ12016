@@ -86,7 +86,7 @@ namespace PleaseThem.States
     {
       get
       {
-        return Components.Where(c => c is Minion).Where(c => ((Minion)c).Workplace == null).Count();
+        return Components.Where(c => c is Minion).Where(c => ((Minion)c).WorkplaceId == null).Count();
       }
     }
 
@@ -108,8 +108,9 @@ namespace PleaseThem.States
           })
         {
           Position = building.DoorPosition,
-          Home = building.Id,
+          HomeId = building.Id,
           IsVisible = false,
+          Id= IdCount++,
         });
       }
     }
@@ -192,6 +193,12 @@ namespace PleaseThem.States
           }
         }
       }
+
+      var validComponents = Components
+        .Where(c => c is Sprite);
+
+      foreach (var validComponent in validComponents)
+        UpdateVisibility((Sprite)validComponent);
 
       GUIComponents = new List<Component>()
       {
@@ -287,6 +294,8 @@ namespace PleaseThem.States
                   newBuilding.TileType == Tiles.TileType.Tree)
                 newBuilding.SetTargetPoints();
 
+              UpdateVisibility(newBuilding);
+
               Components.Add(newBuilding);
 
               _buildingList.SelectedBuilding.Initialise();
@@ -318,30 +327,6 @@ namespace PleaseThem.States
           Components.RemoveAt(i);
           i--;
         }
-      }
-
-      var validComponents = Components
-        .Where(c => !(c.Equals(_buildingList.SelectedBuilding)))
-        .Where(c => c is Sprite);
-
-      var distance = 448;
-
-      // Sigh - this is where 'Origin' would be useful!
-
-      foreach (var tile in Map.BackgroundTiles)
-      {
-        tile.IsVisible = false;
-
-        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
-          tile.IsVisible = true;
-      }
-
-      foreach (var tile in Map.ResourceTiles)
-      {
-        tile.IsVisible = false;
-
-        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
-          tile.IsVisible = true;
       }
     }
 
@@ -429,6 +414,25 @@ namespace PleaseThem.States
       if (CurrentMouse.Y >= 16 && CurrentMouse.Y < (Game1.ScreenHeight - 64))
       {
         PlaceBuilding();
+      }
+    }
+
+    public void UpdateVisibility(Sprite sprite)
+    {
+      var distance = 448;
+
+      // Sigh - this is where 'Origin' would be useful!                
+
+      foreach (var tile in Map.BackgroundTiles)
+      {
+        if (Vector2.Distance(tile.Position, sprite.Position) < distance)
+          tile.IsVisible = true;
+      }
+
+      foreach (var tile in Map.ResourceTiles)
+      {
+        if (Vector2.Distance(tile.Position, sprite.Position) < distance)
+          tile.IsVisible = true;
       }
     }
 
