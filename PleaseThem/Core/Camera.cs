@@ -75,13 +75,13 @@ namespace PleaseThem.Core
       else if (_previousScroll > _currentScroll)
         Scale -= 0.1f;
 
-      if (_currentMouseState.MiddleButton == ButtonState.Pressed &&
-          _previousMouseState.MiddleButton == ButtonState.Released)
+      if (_currentMouseState.LeftButton == ButtonState.Pressed &&
+          _previousMouseState.LeftButton == ButtonState.Released)
       {
         _moveFromLocation = _currentMouseState.Position.ToVector2();
       }
 
-      if (_currentMouseState.MiddleButton == ButtonState.Released)
+      if (_currentMouseState.LeftButton == ButtonState.Released)
         _moveFromLocation = null;
 
       if (_moveFromLocation != null)

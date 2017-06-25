@@ -189,10 +189,11 @@ namespace PleaseThem.States
         }
       }
 
-      GUIComponents = new List<Component>()
+            GUIComponents = new List<Component>()
       {
         new ResourceList(_graphicsDevice, content.Load<SpriteFont>("Fonts/Arial08pt"), this),
         _buildingList,
+        new FX.CursorTrail(_graphicsDevice, content, this)
       };
 
       _camera = new Camera(new Vector2(hallPosition.X - (Game1.ScreenWidth / 2), hallPosition.Y - (Game1.ScreenHeight / 2)));
