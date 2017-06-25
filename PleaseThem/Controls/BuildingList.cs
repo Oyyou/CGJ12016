@@ -67,6 +67,7 @@ namespace PleaseThem.Controls
             SelectedBuilding.IsRemoved = true;
 
           SelectedBuilding = building;
+          SelectedBuilding.BuildingState = BuildingStates.Built;
           SelectedBuilding.Layer = 1.0f;
           button.Selected = true;
         }
@@ -140,23 +141,23 @@ namespace PleaseThem.Controls
 
       if (_lumber.IsClicked)
       {
-        ButtonClick(_lumber, new Lumber(_parent, _content.Load<Texture2D>("Buildings/Lumber")));
+        ButtonClick(_lumber, new Lumber(_parent, _content.Load<Texture2D>("Buildings/Lumber"), 2));
       }
       else if (_mining.IsClicked)
       {
-        ButtonClick(_mining, new Mining(_parent, _content.Load<Texture2D>("Buildings/Mining")));
+        ButtonClick(_mining, new Mining(_parent, _content.Load<Texture2D>("Buildings/Mining"), 2));
       }
       else if (_farm.IsClicked)
       {
-        ButtonClick(_farm, new Farm(_parent, _content.Load<Texture2D>("Buildings/Farm")));
+        ButtonClick(_farm, new Farm(_parent, _content.Load<Texture2D>("Buildings/Farm"), 2));
       }
       else if (_house.IsClicked)
       {
-        ButtonClick(_house, new House(_parent, _content.Load<Texture2D>("Buildings/House")));
+        ButtonClick(_house, new House(_parent, _content.Load<Texture2D>("Buildings/House"), 2));
       }
       else if (_swordSchool.IsClicked)
       {
-        ButtonClick(_swordSchool, new SwordSchool(_parent, _content.Load<Texture2D>("Buildings/SwordSchool")));
+        ButtonClick(_swordSchool, new SwordSchool(_parent, _content.Load<Texture2D>("Buildings/SwordSchool"), 2));
       }
 
       if (SelectedBuilding != null)

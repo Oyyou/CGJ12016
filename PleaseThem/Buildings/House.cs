@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PleaseThem.Actors;
 
 namespace PleaseThem.Buildings
 {
@@ -18,14 +19,19 @@ namespace PleaseThem.Buildings
     {
       get
       {
-        return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height - 32);
+        return new Rectangle((int)Position.X, (int)Position.Y, FrameWidth, _texture.Height - 32);
       }
     }
 
     public override string[] Content => new string[0];
 
-    public House(GameState parent, Texture2D texture)
-      : base(parent, texture)
+    public override void Employ(Minion minion)
+    {
+      
+    }
+
+    public House(GameState parent, Texture2D texture, int frameCount)
+      : base(parent, texture, frameCount)
     {
       Resources = new Models.Resources()
       {
@@ -38,11 +44,12 @@ namespace PleaseThem.Buildings
       MaxMinions = 2;
 
       MinionColor = Color.Brown;
-      TileType = Tiles.TileType.Tree;
+      TileType = Tiles.TileType.Occupied;
     }
 
-    public override void Update(GameTime gameTime)
+    public override void Unemploy()
     {
+      
     }
   }
 }

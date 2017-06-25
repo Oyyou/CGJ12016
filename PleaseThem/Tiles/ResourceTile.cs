@@ -10,6 +10,9 @@ namespace PleaseThem.Tiles
 {
   public class ResourceTile : Tile
   {
+    /// <summary>
+    /// How much resource is left
+    /// </summary>
     public int ResourceCount { get; set; }
 
     public ResourceTile(Texture2D texture, Vector2 position, TileType tileType)

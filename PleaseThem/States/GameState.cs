@@ -51,6 +51,8 @@ namespace PleaseThem.States
 
     public List<Component> GUIComponents { get; private set; }
 
+    public int IdCount { get; private set; }
+
     public Map Map { get; private set; }
 
     public int MaximumMinions { get; private set; }
@@ -84,7 +86,7 @@ namespace PleaseThem.States
     {
       get
       {
-        return Components.Where(c => c is Minion).Where(c => ((Minion)c).Workplace == null).Count();
+        return Components.Where(c => c is Minion).Where(c => ((Minion)c).WorkplaceId == null).Count();
       }
     }
 
@@ -106,8 +108,9 @@ namespace PleaseThem.States
           })
         {
           Position = building.DoorPosition,
-          Home = building,
+          HomeId = building.Id,
           IsVisible = false,
+          Id= IdCount++,
         });
       }
     }
@@ -163,9 +166,11 @@ namespace PleaseThem.States
 
       Components = new List<Component>()
       {
-        new Hall(this, content.Load<Texture2D>("Buildings/Hall"))
+        new Hall(this, content.Load<Texture2D>("Buildings/Hall"), 2)
         {
           Position = hallPosition,
+          BuildingState = BuildingStates.Built,
+          Id = IdCount++,
         },
         _menu,
       };
@@ -188,8 +193,14 @@ namespace PleaseThem.States
           }
         }
       }
+           
+      var validComponents = Components
+        .Where(c => c is Sprite);
 
-            GUIComponents = new List<Component>()
+      foreach (var validComponent in validComponents)
+        UpdateVisibility((Sprite)validComponent);
+
+      GUIComponents = new List<Component>()
       {
         new ResourceList(_graphicsDevice, content.Load<SpriteFont>("Fonts/Arial08pt"), this),
         _buildingList,
@@ -226,14 +237,14 @@ namespace PleaseThem.States
             if (component is Building)
             {
               if (component == _buildingList.SelectedBuilding)
-                break;
+                continue;
             }
 
             if (component is Menu)
-              break;
+              continue;
 
             var building = component as Models.Sprite;
-            if (building.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+            if (building.CollisionRectangle.Intersects(_buildingList.SelectedBuilding.CollisionRectangle))
             {
               canBuild = false;
               break;
@@ -248,7 +259,7 @@ namespace PleaseThem.States
           {
             foreach (var resource in Map.ResourceTiles)
             {
-              if (resource.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+              if (resource.Rectangle.Intersects(_buildingList.SelectedBuilding.CollisionRectangle))
               {
                 canBuild = false;
                 break;
@@ -260,7 +271,7 @@ namespace PleaseThem.States
               if (tile.IsVisible)
                 continue;
 
-              if (tile.Rectangle.Intersects(_buildingList.SelectedBuilding.Rectangle))
+              if (tile.Rectangle.Intersects(_buildingList.SelectedBuilding.CollisionRectangle))
               {
                 canBuild = false;
                 break;
@@ -277,6 +288,14 @@ namespace PleaseThem.States
 
               newBuilding.Color = Color.White;
               newBuilding.Layer = _buildingList.SelectedBuilding.DefaultLayer;
+              newBuilding.BuildingState = BuildingStates.Placed;
+              newBuilding.Id = IdCount++;
+
+              if (newBuilding.TileType == Tiles.TileType.Stone ||
+                  newBuilding.TileType == Tiles.TileType.Tree)
+                newBuilding.SetTargetPoints();
+
+              UpdateVisibility(newBuilding);
 
               Components.Add(newBuilding);
 
@@ -309,30 +328,6 @@ namespace PleaseThem.States
           Components.RemoveAt(i);
           i--;
         }
-      }
-
-      var validComponents = Components
-        .Where(c => !(c.Equals(_buildingList.SelectedBuilding)))
-        .Where(c => c is Sprite);
-
-      var distance = 448;
-
-      // Sigh - this is where 'Origin' would be useful!
-
-      foreach (var tile in Map.BackgroundTiles)
-      {
-        tile.IsVisible = false;
-
-        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
-          tile.IsVisible = true;
-      }
-
-      foreach (var tile in Map.ResourceTiles)
-      {
-        tile.IsVisible = false;
-
-        if (validComponents.Any(c => Vector2.Distance(tile.Position, ((Sprite)c).Position) < distance))
-          tile.IsVisible = true;
       }
     }
 
@@ -368,15 +363,15 @@ namespace PleaseThem.States
 
     public override void Update(GameTime gameTime)
     {
-      if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
-      {
-        SaveGame();
-      }
+      //if (_currentKeyboard.IsKeyUp(Keys.F) && _previousKeyboard.IsKeyDown(Keys.F))
+      //{
+      //  SaveGame();
+      //}
 
-      if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
-      {
-        LoadGame();
-      }
+      //if (_currentKeyboard.IsKeyUp(Keys.J) && _previousKeyboard.IsKeyDown(Keys.J))
+      //{
+      //  LoadGame();
+      //}
 
       SetInput();
 
@@ -420,6 +415,25 @@ namespace PleaseThem.States
       if (CurrentMouse.Y >= 16 && CurrentMouse.Y < (Game1.ScreenHeight - 64))
       {
         PlaceBuilding();
+      }
+    }
+
+    public void UpdateVisibility(Sprite sprite)
+    {
+      var distance = 448;
+
+      // Sigh - this is where 'Origin' would be useful!                
+
+      foreach (var tile in Map.BackgroundTiles)
+      {
+        if (Vector2.Distance(tile.Position, sprite.Position) < distance)
+          tile.IsVisible = true;
+      }
+
+      foreach (var tile in Map.ResourceTiles)
+      {
+        if (Vector2.Distance(tile.Position, sprite.Position) < distance)
+          tile.IsVisible = true;
       }
     }
 

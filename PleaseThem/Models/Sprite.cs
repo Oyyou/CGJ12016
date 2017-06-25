@@ -48,7 +48,7 @@ namespace PleaseThem.Models
     {
       get
       {
-        return _parent.MouseRectangleWithCamera.Intersects(Rectangle);
+        return _parent.MouseRectangleWithCamera.Intersects(CollisionRectangle);
       }
     }
 

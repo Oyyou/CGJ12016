@@ -20,27 +20,32 @@ namespace PleaseThem.Tiles
 
   public class Tile
   {
+    #region Fields
+      
     private bool _beenSeen = false;
+
+    protected Texture2D Texture;
+    
+    #endregion
+      
+    #region Properties
 
     public bool IsVisible = false;
 
-    protected Texture2D Texture;
+    protected float Layer = 0.0f;
+    
     public Vector2 Position { get; protected set; }
+    
     public Rectangle Rectangle
     {
       get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
     }
 
-    protected float Layer = 0.0f;
-
     public TileType TileType { get; protected set; }
-
-    public Tile(Texture2D texture, Vector2 position, TileType tileType)
-    {
-      Texture = texture;
-      Position = position;
-      TileType = tileType;
-    }
+    
+    #endregion
+    
+    #region Methods
 
     public void Draw(SpriteBatch spriteBatch)
     {
@@ -49,13 +54,9 @@ namespace PleaseThem.Tiles
       if (!IsVisible)
       {
         if (!_beenSeen)
-        {
           return;
-        }
         else
-        {
           opcity = 0.5f;
-        }
       }
       else
       {
@@ -65,5 +66,16 @@ namespace PleaseThem.Tiles
 
       spriteBatch.Draw(Texture, Position, null, Color.White * opcity, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
     }
+
+    public Tile(Texture2D texture, Vector2 position, TileType tileType)
+    {
+      Texture = texture;
+      
+      Position = position;
+      
+      TileType = tileType;
+    }
+    
+    #endregion
   }
 }

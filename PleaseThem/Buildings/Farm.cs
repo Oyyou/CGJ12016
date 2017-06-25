@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PleaseThem.Actors;
 using PleaseThem.Controls;
 using PleaseThem.States;
 using System;
@@ -12,16 +13,8 @@ using System.Threading.Tasks;
 
 namespace PleaseThem.Buildings
 {
-  public class BuildingPosition
-  {
-    public bool HasWorker { get; set; }
-    public List<Vector2> Positions { get; set; }
-  }
-
   public class Farm : Building
   {
-    public List<BuildingPosition> FarmPositions { get; set; }
-
     public override string[] Content => new string[] { $"Workers: {CurrentMinions}/{MaxMinions}" };
 
     public override Rectangle CollisionRectangle
@@ -32,8 +25,8 @@ namespace PleaseThem.Buildings
       }
     }
 
-    public Farm(GameState parent, Texture2D texture)
-      : base(parent, texture)
+    public Farm(GameState parent, Texture2D texture, int frameCount)
+      : base(parent, texture, frameCount)
     {
       Resources = new Models.Resources()
       {
@@ -47,47 +40,97 @@ namespace PleaseThem.Buildings
       TileType = Tiles.TileType.Farm;
       MaxMinions = 3;
 
-      FarmPositions = new List<BuildingPosition>();
+      _buildingPositions = new List<PatrolPoints>();
     }
 
     public override void Initialise()
     {
       base.Initialise();
 
-      FarmPositions.Add(new BuildingPosition()
+      _buildingPositions.Add(new PatrolPoints()
       {
         HasWorker = false,
-        Positions = new List<Vector2>()
+        PositionsV2 = new List<PatrolPoints.KILLMENOW>()
         {
-          new Vector2(Position.X + 32, Rectangle.Top + 96),
-          new Vector2(Position.X + 32, Rectangle.Bottom - 32)
-        },
+          new Buildings.PatrolPoints.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 32, Rectangle.Top + 96),
+            IsActive= true,
+          },
+          new Buildings.PatrolPoints.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 32, Rectangle.Bottom - 32),
+            IsActive= false,
+          }
+        }
       });
 
-      FarmPositions.Add(new BuildingPosition()
+      _buildingPositions.Add(new PatrolPoints()
       {
         HasWorker = false,
-        Positions = new List<Vector2>()
+        PositionsV2 = new List<PatrolPoints.KILLMENOW>()
         {
-          new Vector2(Position.X + 96, Rectangle.Top),
-          new Vector2(Position.X + 96, Rectangle.Bottom - 32)
-        },
+          new Buildings.PatrolPoints.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 96, Rectangle.Top),
+            IsActive= true,
+          },
+          new Buildings.PatrolPoints.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 96, Rectangle.Bottom - 32),
+            IsActive= false,
+          }
+        }
       });
 
-      FarmPositions.Add(new BuildingPosition()
+      _buildingPositions.Add(new PatrolPoints()
       {
         HasWorker = false,
-        Positions = new List<Vector2>()
+        PositionsV2 = new List<PatrolPoints.KILLMENOW>()
         {
-          new Vector2(Position.X + 160, Rectangle.Top),
-          new Vector2(Position.X + 160, Rectangle.Bottom - 32)
-        },
+          new Buildings.PatrolPoints.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 160, Rectangle.Top),
+            IsActive= true,
+          },
+          new Buildings.PatrolPoints.KILLMENOW()
+          {
+            Value = new Vector2(Position.X + 160, Rectangle.Bottom - 32),
+            IsActive= false,
+          }
+        }
       });
     }
 
     public override void Update(GameTime gameTime)
     {
       base.Update(gameTime);
+    }
+
+    public override void Work(object sender, EventArgs e)
+    {
+      var minion = sender as Minion;
+
+      var farmPosition = _buildingPositions.Where(c => c.Minion == minion).FirstOrDefault();
+
+      if (farmPosition == null)
+      {
+        farmPosition = _buildingPositions.Where(c => c.Minion == null).FirstOrDefault();
+        farmPosition.Minion = minion;
+      }
+
+      farmPosition.MoveMinion(minion);
+
+      //_resourceCollectionTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+      //if (_resourceCollectionTimer > 2.5f)
+      //{
+      //  _resourceCollectionTimer = 0.0f;
+
+      //  _resources.Food++;
+
+      //  _parent.ResourceManager.Add(_resources);
+      //}
     }
   }
 }

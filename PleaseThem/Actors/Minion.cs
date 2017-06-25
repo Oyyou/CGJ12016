@@ -19,15 +19,11 @@ namespace PleaseThem.Actors
   {
     #region Fields
 
-    private bool _atFarm;
-
     private Vector2 _currentTarget;
 
-    private bool _farmingDown;
+    private Vector2 _currentTile;
 
-    private Vector2 _farmPos1;
-
-    private Vector2 _farmPos2;
+    private Vector2 _previousTile;
 
     private float _resourceCollectionTimer = 0f;
 
@@ -35,6 +31,9 @@ namespace PleaseThem.Actors
 
     private Models.Resources _resources = null;
 
+    /// <summary>
+    /// The tile we're gathering resources from
+    /// </summary>
     private ResourceTile _resourceTile = null;
 
     private Vector2 _velocity;
@@ -43,89 +42,23 @@ namespace PleaseThem.Actors
 
     #region Properties
 
-    public Building Home { get; set; }
+    public int? HomeId { get; set; }
 
     public Vector2 Target { get; private set; }
 
-    public Building Workplace { get; set; }
+    public event EventHandler WorkEvent;
+
+    public int? WorkplaceId { get; set; }
+    
+    public Vector2 Velocity
+    {
+      get { return _velocity; }
+      set { _velocity = value; }
+    }
 
     #endregion
 
     #region Methods
-
-    private void CombatTraining(GameTime gameTime)
-    {
-      var swordSchool = Workplace as SwordSchool;
-
-      if (Target == Vector2.Zero)
-      {
-        var position = swordSchool.BuildingPositions.Where(c => !c.HasWorker).FirstOrDefault();
-        position.HasWorker = true;
-
-        Target = position.Positions[0];
-      }
-
-      if (Target != Position)
-        Move(Target);
-    }
-
-    private void Farming(GameTime gameTime)
-    {
-      var farm = Workplace as Farm;
-
-      if (_farmPos1 == Vector2.Zero)
-      {
-        var farmPosition = farm.FarmPositions.Where(c => !c.HasWorker).FirstOrDefault();
-        farmPosition.HasWorker = true;
-
-        _farmPos1 = farmPosition.Positions[0];
-        _farmPos2 = farmPosition.Positions[1];
-      }
-
-      if (!_atFarm)
-      {
-        Move(_farmPos1);
-
-        if (Position == _farmPos1)
-          _atFarm = true;
-
-        return;
-      }
-
-      if (Position == _farmPos1 ||
-          Position == _farmPos2)
-        _farmingDown = !_farmingDown;
-
-      var node = _farmPos1;
-
-      if (!_farmingDown)
-        node = _farmPos2;
-
-      float speed = 2;
-
-      if (node != null)
-      {
-        if (Position.Y > node.Y)
-          _velocity = new Vector2(0, -speed);
-        else if (Position.Y < node.Y)
-          _velocity = new Vector2(0, speed);
-        else if (Position.X > node.X)
-          _velocity = new Vector2(-speed, 0);
-        else if (Position.X < node.X)
-          _velocity = new Vector2(speed, 0);
-      }
-
-      _resourceCollectionTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-      if (_resourceCollectionTimer > 2.5f)
-      {
-        _resourceCollectionTimer = 0.0f;
-
-        _resources.Food++;
-
-        _parent.ResourceManager.Add(_resources);
-      }
-    }
 
     public Minion(GameState parent, AnimationController animationController)
       : base(parent, animationController)
@@ -137,7 +70,7 @@ namespace PleaseThem.Actors
       Layer = 0.8f;
     }
 
-    private void Move(Vector2 target)
+    public void Move(Vector2 target)
     {
       float speed = 2f;
 
@@ -154,6 +87,14 @@ namespace PleaseThem.Actors
           node = paths.FirstOrDefault() * 32;
 
         _currentTarget = node;
+
+        _previousTile = _currentTile;
+        _currentTile = _currentTarget;
+
+        if (_previousTile != _currentTile)
+        {
+          _parent.UpdateVisibility(this);
+        }
       }
       else node = _currentTarget;
 
@@ -182,13 +123,10 @@ namespace PleaseThem.Actors
     {
       _velocity = new Vector2();
 
-      if (Workplace != null)
+      if (WorkplaceId != null)
         return;
 
       _animationPlayer.Colour = Color.White;
-      _farmPos1 = Vector2.Zero;
-      _farmPos2 = Vector2.Zero;
-      _atFarm = false;
     }
 
     /// <summary>
@@ -198,10 +136,12 @@ namespace PleaseThem.Actors
     private void ReturnHome(GameTime gameTime)
     {
       // If the minion is employed, leave this method
-      if (Workplace != null)
+      if (WorkplaceId != null)
         return;
 
-      if (Position == Home.DoorPosition)
+      var home = _parent.Components.Where(c => c.Id == HomeId.Value).FirstOrDefault() as Building;
+
+      if (Position == home.DoorPosition)
         IsVisible = false;
 
       // If they're already home, leave this method
@@ -209,7 +149,7 @@ namespace PleaseThem.Actors
         return;
 
       // Go to the door position of 'Home'
-      Move(Home.DoorPosition);
+      Move(home.DoorPosition);
     }
 
     private void SetAnimation()
@@ -266,23 +206,19 @@ namespace PleaseThem.Actors
 
     private void Work(GameTime gameTime)
     {
-      if (Workplace == null)
+      if (WorkplaceId == null)
       {
-        _resourceTile = null; // When the minion isn't working, it's targetted resource is set to null
+        _resourceTile = null; // When the minion isn't working, it's targeted resource is set to null
         return;
       }
 
-      if (Workplace.TileType == Tiles.TileType.Farm)
+      var workplace = _parent.Components.Where(c => c.Id == WorkplaceId.Value).FirstOrDefault() as Building;
+
+      if (workplace.TileType == TileType.Farm ||
+          workplace.TileType == TileType.Militia)
       {
-        Farming(gameTime);
-
-        return;
-      }
-
-      if (Workplace.TileType == TileType.Militia)
-      {
-        CombatTraining(gameTime);
-
+        WorkEvent(this, new EventArgs());
+        
         return;
       }
 
@@ -302,8 +238,8 @@ namespace PleaseThem.Actors
         while (Target == Vector2.Zero)
         {
           _resourceTile = _parent.Map.ResourceTiles
-            .Where(c => c.TileType == Workplace.TileType)
-            .OrderBy(c => Vector2.Distance(Workplace.DoorPosition, c.Position)).ToArray()[i]; // Should be the closest
+            .Where(c => c.TileType == workplace.TileType)
+            .OrderBy(c => Vector2.Distance(workplace.DoorPosition, c.Position)).ToArray()[i]; // Should be the closest
 
           var left = _resourceTile.Position - new Vector2(32, 0);
           var right = _resourceTile.Position + new Vector2(32, 0);
@@ -360,7 +296,7 @@ namespace PleaseThem.Actors
           {
             _resourceCollectionTimer = 0.0f;
 
-            switch (Workplace.TileType)
+            switch (workplace.TileType)
             {
               case Tiles.TileType.Tree:
                 _resources.Wood++;
@@ -387,8 +323,8 @@ namespace PleaseThem.Actors
       {
         Target = Vector2.Zero;
 
-        if (Position != Workplace.DoorPosition)
-          Move(Workplace.DoorPosition); // return to resource building
+        if (Position != workplace.DoorPosition)
+          Move(workplace.DoorPosition); // return to resource building
         else
         {
           _parent.ResourceManager.Add(_resources);

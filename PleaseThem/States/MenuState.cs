@@ -13,17 +13,13 @@ namespace PleaseThem.States
   public class MenuState : State
   {
     #region Fields
+
     private List<Button> _buttons;
-
-    private Button _loadGame;
-
-    private Button _newGame;
 
     private Vector2 _position;
 
     private Texture2D _texture;
 
-    private Button _quit;
     #endregion
 
     #region Methods
@@ -54,9 +50,9 @@ namespace PleaseThem.States
       Texture2D buttonTexture = Content.Load<Texture2D>("Controls/Button");
       SpriteFont font = Content.Load<SpriteFont>("Fonts/Arial08pt");
 
-      _newGame = new Button(buttonTexture, font, new Vector2(336, 300));
-      _loadGame = new Button(buttonTexture, font, new Vector2(336, 350));
-      _quit = new Button(buttonTexture, font, new Vector2(336, 400));
+      var _newGame = new Button(buttonTexture, font, new Vector2(336, 300));
+      var _loadGame = new Button(buttonTexture, font, new Vector2(336, 350));
+      var _quit = new Button(buttonTexture, font, new Vector2(336, 400));
 
       _newGame.Text = "New Game";
       _loadGame.Text = "Load Game";
