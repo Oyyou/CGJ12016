@@ -57,6 +57,7 @@
     <Compile Include="Core\AnimationPlayer.cs" />
     <Compile Include="Core\Camera.cs" />
     <Compile Include="Core\Pathfinder.cs" />
+    <Compile Include="FX\AnimatedParticle.cs" />
     <Compile Include="FX\CursorTrail.cs" />
     <Compile Include="FX\Particle.cs" />
     <Compile Include="Game1.cs" />

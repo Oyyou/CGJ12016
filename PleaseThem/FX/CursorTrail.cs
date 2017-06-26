@@ -39,7 +39,7 @@ namespace PleaseThem.FX
 
             for (int i = 0; i < 10; i++)
             {
-                var temp = new Particle(gameState, _particleTexture, 0.1f);
+                var temp = new Particle(gameState, _particleTexture,0.1f);
                 _trailObjects.Add(temp);
             }
         }
